@@ -1,16 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { AdminDashboard } from '@/components/admin/admin-dashboard'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Shield, Lock } from 'lucide-react'
+import { Shield, Lock, Loader2 } from 'lucide-react'
 
 const ADMIN_TOKEN = 'rimzone-admin-2024'
 
-export default function AdminPage() {
+function AdminContent() {
   const searchParams = useSearchParams()
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [tokenInput, setTokenInput] = useState('')
@@ -80,4 +80,20 @@ export default function AdminPage() {
   }
 
   return <AdminDashboard />
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+    </div>
+  )
+}
+
+export default function AdminPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <AdminContent />
+    </Suspense>
+  )
 }
