@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { useSupport } from '@/lib/contexts/support-context'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -55,7 +56,7 @@ const CONTACTS = [
 type View = 'main' | 'form' | 'success'
 
 export function SupportWidget() {
-  const [isOpen, setIsOpen] = useState(false)
+  const { isOpen, openSupport, closeSupport } = useSupport()
   const [view, setView] = useState<View>('main')
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -102,7 +103,7 @@ export function SupportWidget() {
   }
 
   const handleClose = () => {
-    setIsOpen(false)
+    closeSupport()
     setTimeout(() => setView('main'), 300)
   }
 
@@ -110,7 +111,7 @@ export function SupportWidget() {
     <>
       {/* Кнопка открытия */}
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={openSupport}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
         aria-label="Открыть поддержку"
       >
@@ -164,7 +165,7 @@ export function SupportWidget() {
                   Выберите удобный способ связи или оставьте заявку
                 </p>
 
-                {/* Быстрая связь */}
+                {/* Быс��рая связь */}
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                     Быстрая связь

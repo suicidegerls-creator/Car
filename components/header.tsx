@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
-import { Menu, X, Search, User } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Menu, X, Search, User, LogIn } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { CartSheet } from "@/components/cart/cart-sheet"
+import { createClient } from "@/lib/supabase/client"
+import type { User as SupabaseUser } from "@supabase/supabase-js"
 
 const navItems = [
   { name: "Каталог", href: "/catalog" },
@@ -15,6 +17,22 @@ const navItems = [
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [user, setUser] = useState<SupabaseUser | null>(null)
+  const supabase = createClient()
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    getUser()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [supabase.auth])
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -48,9 +66,20 @@ export function Header() {
             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
               <Search className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-              <User className="w-5 h-5" />
-            </Button>
+            {user ? (
+              <Link href="/account">
+                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                  <User className="w-5 h-5" />
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/auth/login">
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Войти
+                </Button>
+              </Link>
+            )}
             <CartSheet />
           </div>
 
@@ -82,9 +111,20 @@ export function Header() {
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
                 <Search className="w-5 h-5" />
               </Button>
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-                <User className="w-5 h-5" />
-              </Button>
+              {user ? (
+                <Link href="/account" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                    <User className="w-5 h-5" />
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Войти
+                  </Button>
+                </Link>
+              )}
               <CartSheet />
             </div>
           </div>

@@ -2,8 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Phone } from "lucide-react"
+import { useSupport } from "@/lib/contexts/support-context"
 
 export function CTASection() {
+  const { openSupport } = useSupport()
   return (
     <section className="py-20 sm:py-32 bg-background relative overflow-hidden">
       {/* Background decoration */}
@@ -22,7 +24,11 @@ export function CTASection() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-foreground text-background hover:bg-foreground/90 px-8">
+            <Button 
+              size="lg" 
+              className="bg-foreground text-background hover:bg-foreground/90 px-8"
+              onClick={openSupport}
+            >
               Получить консультацию
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
