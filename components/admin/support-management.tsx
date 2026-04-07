@@ -16,6 +16,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -290,6 +291,9 @@ export function SupportManagement() {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Обращение</DialogTitle>
+            <DialogDescription>
+              Детали обращения в поддержку
+            </DialogDescription>
           </DialogHeader>
           {selectedRequest && (
             <div className="space-y-4">

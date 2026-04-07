@@ -1,12 +1,14 @@
 'use client'
 
 import { useCart } from '@/hooks/use-cart'
+import { CartItem } from '@/lib/types/order'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
   SheetTrigger,
   SheetFooter,
 } from '@/components/ui/sheet'
@@ -15,16 +17,39 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 
 export function CartSheet() {
-  const { items, removeItem, updateQuantity, getTotalPrice, getTotalItems } = useCart()
   const [mounted, setMounted] = useState(false)
   const [open, setOpen] = useState(false)
+  const [cartState, setCartState] = useState<{ items: CartItem[], totalItems: number, totalPrice: number }>({
+    items: [],
+    totalItems: 0,
+    totalPrice: 0,
+  })
 
   useEffect(() => {
     setMounted(true)
+    // Initial state
+    const state = useCart.getState()
+    setCartState({
+      items: state.items,
+      totalItems: state.getTotalItems(),
+      totalPrice: state.getTotalPrice(),
+    })
+    
+    // Subscribe to changes
+    const unsubscribe = useCart.subscribe((state) => {
+      setCartState({
+        items: state.items,
+        totalItems: state.getTotalItems(),
+        totalPrice: state.getTotalPrice(),
+      })
+    })
+    
+    return () => unsubscribe()
   }, [])
 
-  const totalItems = mounted ? getTotalItems() : 0
-  const totalPrice = mounted ? getTotalPrice() : 0
+  const { items, totalItems, totalPrice } = cartState
+  const removeItem = useCart.getState().removeItem
+  const updateQuantity = useCart.getState().updateQuantity
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -49,6 +74,9 @@ export function CartSheet() {
               </span>
             )}
           </SheetTitle>
+          <SheetDescription className="sr-only">
+            Просмотр и управление товарами в корзине
+          </SheetDescription>
         </SheetHeader>
 
         <div className="flex-1 overflow-auto py-4">

@@ -1,28 +1,28 @@
 "use client"
 
 import { Canvas, useFrame } from "@react-three/fiber"
-import { Environment, Float, ContactShadows } from "@react-three/drei"
-import { useRef, Suspense } from "react"
+import { useRef, Suspense, useState } from "react"
 import type { Mesh, Group } from "three"
 
 function Wheel() {
   const wheelRef = useRef<Group>(null)
+  const elapsedRef = useRef(0)
 
-  useFrame((state) => {
+  useFrame((_, delta) => {
+    elapsedRef.current += delta
     if (wheelRef.current) {
       wheelRef.current.rotation.y += 0.005
-      wheelRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3) * 0.1
+      wheelRef.current.rotation.x = Math.sin(elapsedRef.current * 0.3) * 0.1
     }
   })
 
   return (
-    <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.3}>
       <group ref={wheelRef} position={[0, 0, 0]}>
         {/* Outer rim */}
         <mesh>
           <torusGeometry args={[2, 0.3, 32, 64]} />
           <meshStandardMaterial
-            color="#1a1a1a"
+            color="#303030"
             metalness={0.95}
             roughness={0.1}
           />
@@ -32,7 +32,7 @@ function Wheel() {
         <mesh>
           <torusGeometry args={[2.15, 0.08, 16, 64]} />
           <meshStandardMaterial
-            color="#c0c0c0"
+            color="#e0e0e0"
             metalness={1}
             roughness={0.05}
           />
@@ -74,7 +74,7 @@ function Wheel() {
             <mesh position={[1.1, 0, 0.05]} rotation={[0, 0, 0]}>
               <boxGeometry args={[1.4, 0.35, 0.15]} />
               <meshStandardMaterial
-                color="#1a1a1a"
+                color="#404040"
                 metalness={0.9}
                 roughness={0.15}
               />
@@ -83,7 +83,7 @@ function Wheel() {
             <mesh position={[1.1, 0, 0.13]} rotation={[0, 0, 0]}>
               <boxGeometry args={[1.3, 0.08, 0.02]} />
               <meshStandardMaterial
-                color="#404040"
+                color="#707070"
                 metalness={0.95}
                 roughness={0.1}
               />
@@ -138,7 +138,6 @@ function Wheel() {
           />
         </mesh>
       </group>
-    </Float>
   )
 }
 
@@ -164,39 +163,54 @@ export function Wheel3D() {
     <div className="w-full h-full">
       <Canvas
         camera={{ position: [0, 0, 8], fov: 45 }}
-        gl={{ antialias: true }}
+        gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
+        style={{ background: 'transparent' }}
       >
-        <color attach="background" args={["#0a0a0a"]} />
-        <fog attach="fog" args={["#0a0a0a", 10, 20]} />
 
-        <ambientLight intensity={0.3} />
+        {/* Ambient base light */}
+        <ambientLight intensity={0.8} />
+        
+        {/* Main key light - bright white from top right */}
         <spotLight
-          position={[5, 5, 5]}
-          angle={0.3}
-          penumbra={1}
-          intensity={1}
+          position={[6, 6, 6]}
+          angle={0.4}
+          penumbra={0.8}
+          intensity={3}
           castShadow
+          color="#ffffff"
         />
+        
+        {/* Fill light - warm tone from left */}
         <spotLight
-          position={[-5, 3, 5]}
-          angle={0.3}
+          position={[-6, 4, 5]}
+          angle={0.5}
           penumbra={1}
-          intensity={0.5}
-          color="#ffedd5"
+          intensity={2}
+          color="#fff5e6"
         />
-        <pointLight position={[0, -5, 5]} intensity={0.3} color="#60a5fa" />
+        
+        {/* Rim light - creates edge highlights from behind */}
+        <spotLight
+          position={[0, 0, -8]}
+          angle={0.6}
+          penumbra={0.5}
+          intensity={2}
+          color="#e0e0e0"
+        />
+        
+        {/* Bottom accent light - cool blue tone */}
+        <pointLight position={[0, -6, 4]} intensity={1.2} color="#4a9eff" />
+        
+        {/* Top accent light - subtle warm highlight */}
+        <pointLight position={[0, 6, 3]} intensity={1} color="#ffd699" />
+        
+        {/* Side accent lights for metallic reflections */}
+        <pointLight position={[8, 0, 2]} intensity={1} color="#ffffff" />
+        <pointLight position={[-8, 0, 2]} intensity={1} color="#ffffff" />
 
         <Suspense fallback={<LoadingSpinner />}>
           <Wheel />
-          <ContactShadows
-            position={[0, -3.5, 0]}
-            opacity={0.4}
-            scale={10}
-            blur={2}
-            far={4}
-          />
-          <Environment preset="studio" />
         </Suspense>
       </Canvas>
     </div>

@@ -14,6 +14,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -257,6 +258,9 @@ export function OrdersManagement() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Заказ от {selectedOrder && formatDate(selectedOrder.created_at)}</DialogTitle>
+            <DialogDescription>
+              Просмотр деталей заказа и управление статусом
+            </DialogDescription>
           </DialogHeader>
           
           {selectedOrder && (

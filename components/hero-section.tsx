@@ -32,7 +32,7 @@ export function HeroSection() {
             <span className="text-muted-foreground">в деталях</span>
           </h1>
           <p className="mt-6 text-muted-foreground text-base sm:text-lg max-w-md mx-auto lg:mx-0 leading-relaxed">
-            Откройте коллекцию эксклюзивных литых и кованых дисков от ведущих мировых производителей
+            {"Откройте коллекцию эксклюзивных литых и кованых дисков от ведущих мировых производителей"}
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-8">

@@ -15,6 +15,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -60,10 +61,8 @@ export function AdminDashboard() {
     if (!confirm('Удалить этот диск?')) return
     
     try {
-      console.log('[v0] Deleting wheel:', id)
       const res = await fetch(`/api/wheels/${id}`, { method: 'DELETE' })
       const data = await res.json()
-      console.log('[v0] Delete response:', res.status, data)
       
       if (!res.ok) {
         alert(`Ошибка удаления: ${data.error || 'Неизвестная ошибка'}`)
@@ -72,7 +71,7 @@ export function AdminDashboard() {
       
       fetchWheels()
     } catch (error) {
-      console.error('[v0] Error deleting wheel:', error)
+      console.error('Error deleting wheel:', error)
       alert('Ошибка при удалении диска')
     }
   }
@@ -191,6 +190,9 @@ export function AdminDashboard() {
               <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Добавить новый диск</DialogTitle>
+                  <DialogDescription>
+                    Заполните форму для добавления нового диска в каталог
+                  </DialogDescription>
                 </DialogHeader>
                 <WheelForm onSuccess={handleSuccess} />
               </DialogContent>
@@ -207,7 +209,7 @@ export function AdminDashboard() {
               </div>
             ) : wheels.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
-                Товары не найдены. Добавьте первый диск!
+                Товары не найдены. Добавьте перв��й диск!
               </div>
             ) : (
               <Table>
@@ -282,6 +284,9 @@ export function AdminDashboard() {
                             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                               <DialogHeader>
                                 <DialogTitle>Редактировать диск</DialogTitle>
+                                <DialogDescription>
+                                  Измените данные диска и сохраните изменения
+                                </DialogDescription>
                               </DialogHeader>
                               <WheelForm wheel={wheel} onSuccess={handleSuccess} />
                             </DialogContent>

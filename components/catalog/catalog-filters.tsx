@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { ReadonlyURLSearchParams } from 'next/navigation'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -48,11 +48,61 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
   const [selectedModification, setSelectedModification] = useState<string>('none')
   const [carDiameter, setCarDiameter] = useState<string>('none')
 
+  // Price debounce state
+  const [minPrice, setMinPrice] = useState(searchParams.get('min_price') || '')
+  const [maxPrice, setMaxPrice] = useState(searchParams.get('max_price') || '')
+
   // Reset model when brand changes
   useEffect(() => {
     setSelectedModel('none')
     setSelectedModification('none')
   }, [selectedBrand])
+
+  // Sync price inputs with URL
+  useEffect(() => {
+    setMinPrice(searchParams.get('min_price') || '')
+    setMaxPrice(searchParams.get('max_price') || '')
+  }, [searchParams])
+
+  // Debounced price update
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const currentMin = searchParams.get('min_price') || ''
+      const currentMax = searchParams.get('max_price') || ''
+      
+      if (minPrice !== currentMin || maxPrice !== currentMax) {
+        updateParams({
+          min_price: minPrice || null,
+          max_price: maxPrice || null,
+        })
+      }
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [minPrice, maxPrice])
+
+  // Live update for car filters
+  const handleCarBrandChange = useCallback((value: string) => {
+    setSelectedBrand(value)
+    updateParams({ 
+      car_brand: value !== 'none' ? value : null,
+      car_model: null 
+    })
+  }, [updateParams])
+
+  const handleCarYearChange = useCallback((value: string) => {
+    setSelectedYear(value)
+    updateParams({ car_year: value !== 'none' ? value : null })
+  }, [updateParams])
+
+  const handleCarModelChange = useCallback((value: string) => {
+    setSelectedModel(value)
+    updateParams({ car_model: value !== 'none' ? value : null })
+  }, [updateParams])
+
+  const handleCarDiameterChange = useCallback((value: string) => {
+    setCarDiameter(value)
+    updateParams({ diameter: value !== 'none' ? value : null })
+  }, [updateParams])
 
   const getParam = (key: string) => searchParams.get(key) || ''
 
@@ -105,6 +155,8 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
     setSelectedModel('none')
     setSelectedModification('none')
     setCarDiameter('none')
+    setMinPrice('')
+    setMaxPrice('')
   }
 
   return (
@@ -125,7 +177,7 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
         <TabsContent value="car" className="space-y-3 mt-0">
           <div className="space-y-2">
             <Label className="text-xs text-muted-foreground">Марка</Label>
-            <Select value={selectedBrand} onValueChange={setSelectedBrand}>
+            <Select value={selectedBrand} onValueChange={handleCarBrandChange}>
               <SelectTrigger className="h-9">
                 <SelectValue placeholder="Выберите марку" />
               </SelectTrigger>
@@ -140,7 +192,7 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
 
           <div className="space-y-2">
             <Label className="text-xs text-muted-foreground">Год выпуска</Label>
-            <Select value={selectedYear} onValueChange={setSelectedYear}>
+            <Select value={selectedYear} onValueChange={handleCarYearChange}>
               <SelectTrigger className="h-9">
                 <SelectValue placeholder="Выберите год" />
               </SelectTrigger>
@@ -157,7 +209,7 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
             <Label className="text-xs text-muted-foreground">Модель</Label>
             <Select
               value={selectedModel}
-              onValueChange={setSelectedModel}
+              onValueChange={handleCarModelChange}
               disabled={selectedBrand === 'none'}
             >
               <SelectTrigger className="h-9">
@@ -193,7 +245,7 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
 
           <div className="space-y-2">
             <Label className="text-xs text-muted-foreground">Диаметр</Label>
-            <Select value={carDiameter} onValueChange={setCarDiameter}>
+            <Select value={carDiameter} onValueChange={handleCarDiameterChange}>
               <SelectTrigger className="h-9">
                 <SelectValue placeholder="Выберите диаметр" />
               </SelectTrigger>
@@ -378,15 +430,15 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
                     type="number"
                     placeholder="от Р"
                     className="h-9"
-                    value={getParam('min_price')}
-                    onChange={(e) => updateParams({ min_price: e.target.value || null })}
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(e.target.value)}
                   />
                   <Input
                     type="number"
                     placeholder="до Р"
                     className="h-9"
-                    value={getParam('max_price')}
-                    onChange={(e) => updateParams({ max_price: e.target.value || null })}
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(e.target.value)}
                   />
                 </div>
               </AccordionContent>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -19,6 +19,8 @@ import {
 } from 'lucide-react'
 import { Wheel, WHEEL_TYPE_LABELS } from '@/lib/types/wheel'
 import { AddToCartButton } from '@/components/cart/add-to-cart-button'
+import { useViewHistory } from '@/hooks/use-view-history'
+import { Recommendations } from './recommendations'
 
 interface ProductDetailsProps {
   wheel: Wheel
@@ -27,6 +29,43 @@ interface ProductDetailsProps {
 export function ProductDetails({ wheel }: ProductDetailsProps) {
   const [selectedImage, setSelectedImage] = useState(0)
   const images = wheel.images?.length > 0 ? wheel.images : []
+  
+  const trackView = useViewHistory((state) => state.trackView)
+  const updateViewDuration = useViewHistory((state) => state.updateViewDuration)
+  const viewStartTime = useRef<number>(Date.now())
+
+  // Отслеживаем просмотр товара
+  useEffect(() => {
+    trackView({
+      id: wheel.id,
+      name: wheel.name,
+      brand: wheel.brand,
+      diameter: wheel.diameter,
+      color: wheel.color,
+      wheel_type: wheel.wheel_type,
+      price: wheel.price,
+      image: wheel.images?.[0] || null,
+    })
+
+    viewStartTime.current = Date.now()
+
+    // Обновляем длительность просмотра каждые 5 секунд
+    const durationInterval = setInterval(() => {
+      const duration = Math.floor((Date.now() - viewStartTime.current) / 1000)
+      if (duration > 0) {
+        updateViewDuration(wheel.id, 5)
+      }
+    }, 5000)
+
+    // При уходе со страницы записываем финальную длительность
+    return () => {
+      clearInterval(durationInterval)
+      const finalDuration = Math.floor((Date.now() - viewStartTime.current) / 1000)
+      if (finalDuration > 0) {
+        updateViewDuration(wheel.id, finalDuration % 5) // Записываем остаток
+      }
+    }
+  }, [wheel.id, wheel.name, wheel.brand, wheel.diameter, wheel.color, wheel.wheel_type, wheel.price, wheel.images, trackView, updateViewDuration])
 
   const nextImage = () => {
     if (images.length > 1) {
@@ -242,6 +281,24 @@ export function ProductDetails({ wheel }: ProductDetailsProps) {
           <p className="text-muted-foreground leading-relaxed">{wheel.description}</p>
         </div>
       )}
+
+      {/* Recommendations */}
+      <div className="mt-12">
+        <Recommendations 
+          currentWheelId={wheel.id} 
+          type="personalized"
+          title="Рекомендуем на основе ваших просмотров"
+          limit={6}
+        />
+      </div>
+
+      <div className="mt-8">
+        <Recommendations 
+          currentWheelId={wheel.id} 
+          type="recently-viewed"
+          limit={6}
+        />
+      </div>
     </div>
   )
 }

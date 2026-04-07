@@ -9,7 +9,7 @@ import { Wheel } from '@/lib/types/wheel'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { SlidersHorizontal, X } from 'lucide-react'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet'
 import { CatalogSkeleton } from './catalog-skeleton'
 
 // Wrapper with Suspense for useSearchParams
@@ -40,11 +40,8 @@ function CatalogContentInner() {
       const params = new URLSearchParams(searchParams.toString())
       if (!params.has('limit')) params.set('limit', '12')
 
-      console.log('[v0] Fetching wheels with params:', params.toString())
       const res = await fetch(`/api/wheels?${params}`)
-      console.log('[v0] Response status:', res.status)
       const json = await res.json()
-      console.log('[v0] Response data:', json)
       
       setWheels(json.data || [])
       setTotal(json.total || 0)
@@ -88,7 +85,7 @@ function CatalogContentInner() {
   ).length
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
+    <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 overflow-hidden">
       {/* Desktop Filters */}
       <aside className="hidden lg:block w-72 flex-shrink-0">
         <div className="sticky top-24">
@@ -110,7 +107,7 @@ function CatalogContentInner() {
       {/* Main Content */}
       <div className="flex-1">
         {/* Mobile Filters & Sort */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
           <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" className="lg:hidden">
@@ -134,6 +131,9 @@ function CatalogContentInner() {
                     </Button>
                   )}
                 </SheetTitle>
+                <SheetDescription className="sr-only">
+                  Настройка фильтров для поиска дисков
+                </SheetDescription>
               </SheetHeader>
               <div className="mt-6">
                 <CatalogFilters
@@ -147,9 +147,9 @@ function CatalogContentInner() {
             </SheetContent>
           </Sheet>
 
-          <div className="flex-1 flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Найдено: <span className="font-medium text-foreground">{total}</span> товаров
+          <div className="flex-1 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Найдено: <span className="font-medium text-foreground">{total}</span>
             </p>
             <Select
               value={`${sortBy}-${sortOrder}`}
@@ -158,7 +158,7 @@ function CatalogContentInner() {
                 updateParams({ sort_by: newSortBy, sort_order: newSortOrder })
               }}
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[140px] sm:w-[180px] text-xs sm:text-sm">
                 <SelectValue placeholder="Сортировка" />
               </SelectTrigger>
               <SelectContent>
