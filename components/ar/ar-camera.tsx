@@ -59,79 +59,51 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
 
   const { addItem } = useCart()
 
-  // Start camera
+  // Start camera - simplified version for better mobile compatibility
   const startCamera = useCallback(async (mode: 'environment' | 'user') => {
     setIsLoading(true)
     setCameraError(null)
 
-    try {
-      // Stop existing stream first
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop())
-      }
-      
-      // Try to get camera access
-      const constraints: MediaStreamConstraints = {
-        video: {
-          facingMode: mode,
-          width: { ideal: 1280, min: 640 },
-          height: { ideal: 720, min: 480 }
-        },
-        audio: false
-      }
+    // Stop existing stream first
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop())
+      setStream(null)
+    }
 
-      const newStream = await navigator.mediaDevices.getUserMedia(constraints)
+    try {
+      // Simple constraints for maximum compatibility
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: mode },
+        audio: false
+      })
+      
       setStream(newStream)
       
-      if (videoRef.current) {
-        videoRef.current.srcObject = newStream
+      const video = videoRef.current
+      if (video) {
+        video.srcObject = newStream
+        video.setAttribute('playsinline', 'true')
+        video.setAttribute('webkit-playsinline', 'true')
+        video.muted = true
         
-        // Wait for video to load and play
-        await new Promise<void>((resolve, reject) => {
-          const video = videoRef.current!
-          
-          const onCanPlay = () => {
-            video.removeEventListener('canplay', onCanPlay)
-            video.removeEventListener('error', onError)
-            resolve()
-          }
-          
-          const onError = () => {
-            video.removeEventListener('canplay', onCanPlay)
-            video.removeEventListener('error', onError)
-            reject(new Error('Video failed to load'))
-          }
-          
-          video.addEventListener('canplay', onCanPlay)
-          video.addEventListener('error', onError)
-          
-          // Timeout fallback
-          setTimeout(() => {
-            video.removeEventListener('canplay', onCanPlay)
-            video.removeEventListener('error', onError)
-            resolve() // Resolve anyway after timeout
-          }, 3000)
+        // Simple play with error handling
+        video.play().catch(() => {
+          // If autoplay fails, user needs to tap
         })
-
-        try {
-          await videoRef.current.play()
-        } catch (playError) {
-          // Autoplay might be blocked, but video should still show
-          console.warn('Video autoplay blocked:', playError)
-        }
       }
-
+      
       setIsLoading(false)
     } catch (error: unknown) {
-      console.error('Camera error:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      const err = error as Error
       
-      if (errorMessage.includes('Permission denied') || errorMessage.includes('NotAllowedError')) {
-        setCameraError('Доступ к камере запрещен. Разрешите доступ в настройках браузера.')
-      } else if (errorMessage.includes('NotFoundError') || errorMessage.includes('DevicesNotFoundError')) {
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        setCameraError('Доступ к камере запрещен. Разрешите доступ в настройках браузера и обновите страницу.')
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
         setCameraError('Камера не найдена на этом устройстве.')
+      } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+        setCameraError('Камера занята другим приложением. Закройте другие приложения и попробуйте снова.')
       } else {
-        setCameraError('Не удалось запустить камеру. Попробуйте обновить страницу.')
+        setCameraError(`Ошибка камеры: ${err.message || 'Неизвестная ошибка'}`)
       }
       setIsLoading(false)
     }
@@ -374,11 +346,16 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
         style={{ 
           minWidth: '100%', 
           minHeight: '100%',
-          background: '#000'
+          background: '#000',
+          transform: facingMode === 'user' ? 'scaleX(-1)' : 'none'
         }}
         playsInline
+        webkit-playsinline="true"
         muted
         autoPlay
+        onLoadedMetadata={() => {
+          videoRef.current?.play().catch(() => {})
+        }}
       />
 
       {/* Hidden canvas for capture */}
