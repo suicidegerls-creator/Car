@@ -91,13 +91,11 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
       formDataUpload.append('file', file)
 
       try {
-        console.log('[v0] Uploading file:', file.name, file.size, 'bytes')
         const res = await fetch('/api/upload', {
           method: 'POST',
           body: formDataUpload,
         })
         const data = await res.json()
-        console.log('[v0] Upload response:', data)
         
         if (!res.ok) {
           alert(`Ошибка загрузки: ${data.error || 'Неизвестная ошибка'}`)
@@ -106,10 +104,9 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
         
         if (data.url) {
           setImages((prev) => [...prev, data.url])
-          console.log('[v0] Image added:', data.url)
         }
       } catch (error) {
-        console.error('[v0] Upload error:', error)
+        console.error('Upload error:', error)
         alert('Ошибка при загрузке изображения')
       }
     }

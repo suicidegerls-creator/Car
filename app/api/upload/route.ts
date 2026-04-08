@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
 
     // Получаем метаданные изображения
     const metadata = await sharp(buffer).metadata()
-    console.log('[v0] Original image:', metadata.width, 'x', metadata.height, metadata.format)
 
     // Оптимизируем изображение
     let optimizedBuffer: Buffer
@@ -68,8 +67,6 @@ export async function POST(request: NextRequest) {
 
     // Получаем метаданные оптимизированного изображения
     const optimizedMetadata = await sharp(optimizedBuffer).metadata()
-    console.log('[v0] Optimized image:', optimizedMetadata.width, 'x', optimizedMetadata.height, 
-      'Size:', (optimizedBuffer.length / 1024).toFixed(1), 'KB')
 
     // Генерируем уникальное имя файла
     const timestamp = Date.now()
@@ -77,26 +74,21 @@ export async function POST(request: NextRequest) {
     const safeBaseName = baseName.replace(/[^a-zA-Z0-9_-]/g, '_') // Безопасное имя
     const fileName = `wheels/${timestamp}-${safeBaseName}.webp`
 
-    // Загружаем оптимизированное изображение (private store)
+    // Загружаем оптимизированное изображение (public store для изображений товаров)
     const blob = await put(fileName, optimizedBuffer, {
-      access: 'private',
+      access: 'public',
       contentType: 'image/webp',
     })
 
-    console.log('[v0] Uploaded to:', blob.pathname)
-
-    // Возвращаем URL для доступа через наш API
-    const publicUrl = `/api/image/${encodeURIComponent(blob.pathname)}`
-
     return NextResponse.json({ 
-      url: publicUrl,
+      url: blob.url,
       pathname: blob.pathname,
       width: optimizedMetadata.width,
       height: optimizedMetadata.height,
       size: optimizedBuffer.length,
     })
   } catch (error) {
-    console.error('[v0] Upload error:', error)
+    console.error('Upload error:', error)
     return NextResponse.json({ error: 'Upload failed: ' + (error as Error).message }, { status: 500 })
   }
 }
