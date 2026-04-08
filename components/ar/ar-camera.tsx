@@ -66,50 +66,76 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
 
     try {
       // Stop existing stream first
-      if (videoRef.current?.srcObject) {
-        const oldStream = videoRef.current.srcObject as MediaStream
-        oldStream.getTracks().forEach(track => track.stop())
-        videoRef.current.srcObject = null
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop())
       }
-
-      console.log('[v0] Requesting camera with mode:', mode)
       
-      const newStream = await navigator.mediaDevices.getUserMedia({
+      // Try to get camera access
+      const constraints: MediaStreamConstraints = {
         video: {
           facingMode: mode,
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
+          width: { ideal: 1280, min: 640 },
+          height: { ideal: 720, min: 480 }
         },
         audio: false
-      })
+      }
 
-      console.log('[v0] Got stream:', newStream.getVideoTracks().length, 'video tracks')
+      const newStream = await navigator.mediaDevices.getUserMedia(constraints)
+      setStream(newStream)
       
       if (videoRef.current) {
         videoRef.current.srcObject = newStream
         
-        // Wait for video to be ready
-        videoRef.current.onloadedmetadata = () => {
-          console.log('[v0] Video metadata loaded')
-          videoRef.current?.play()
-            .then(() => {
-              console.log('[v0] Video playing')
-              setIsLoading(false)
-            })
-            .catch((e) => {
-              console.error('[v0] Video play error:', e)
-              setIsLoading(false)
-            })
+        // Wait for video to load and play
+        await new Promise<void>((resolve, reject) => {
+          const video = videoRef.current!
+          
+          const onCanPlay = () => {
+            video.removeEventListener('canplay', onCanPlay)
+            video.removeEventListener('error', onError)
+            resolve()
+          }
+          
+          const onError = () => {
+            video.removeEventListener('canplay', onCanPlay)
+            video.removeEventListener('error', onError)
+            reject(new Error('Video failed to load'))
+          }
+          
+          video.addEventListener('canplay', onCanPlay)
+          video.addEventListener('error', onError)
+          
+          // Timeout fallback
+          setTimeout(() => {
+            video.removeEventListener('canplay', onCanPlay)
+            video.removeEventListener('error', onError)
+            resolve() // Resolve anyway after timeout
+          }, 3000)
+        })
+
+        try {
+          await videoRef.current.play()
+        } catch (playError) {
+          // Autoplay might be blocked, but video should still show
+          console.warn('Video autoplay blocked:', playError)
         }
       }
 
-      setStream(newStream)
-    } catch (error) {
-      console.error('[v0] Camera error:', error)
-      setCameraError('Не удалось получить доступ к камере. Проверьте разрешения в настройках браузера.')
+      setIsLoading(false)
+    } catch (error: unknown) {
+      console.error('Camera error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      
+      if (errorMessage.includes('Permission denied') || errorMessage.includes('NotAllowedError')) {
+        setCameraError('Доступ к камере запрещен. Разрешите доступ в настройках браузера.')
+      } else if (errorMessage.includes('NotFoundError') || errorMessage.includes('DevicesNotFoundError')) {
+        setCameraError('Камера не найдена на этом устройстве.')
+      } else {
+        setCameraError('Не удалось запустить камеру. Попробуйте обновить страницу.')
+      }
       setIsLoading(false)
     }
-  }, [])
+  }, [stream])
 
   // Initialize camera on mount
   useEffect(() => {
@@ -264,7 +290,7 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
           <h2 className="text-xl font-bold mb-2">Ошибка камеры</h2>
           <p className="text-muted-foreground mb-4">{cameraError}</p>
           <div className="flex gap-2 justify-center">
-            <Button onClick={startCamera}>Попробовать снова</Button>
+            <Button onClick={() => startCamera(facingMode)}>Попробовать снова</Button>
             <Button variant="outline" onClick={onBack}>Назад</Button>
           </div>
         </div>
@@ -344,7 +370,12 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
       {/* Video feed */}
       <video
         ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+        style={{ 
+          minWidth: '100%', 
+          minHeight: '100%',
+          background: '#000'
+        }}
         playsInline
         muted
         autoPlay
