@@ -7,15 +7,20 @@ export async function POST(request: NextRequest) {
   
   try {
     const body = await request.json()
-    const { items, customer_name, customer_phone, customer_email, delivery_city, delivery_address, delivery_comment } = body
+    const { items, customer_name, customer_phone, customer_email, delivery_type, delivery_city, delivery_address, delivery_comment } = body
     
     // Валидация
     if (!items?.length) {
       return NextResponse.json({ error: 'Корзина пуста' }, { status: 400 })
     }
     
-    if (!customer_name || !customer_phone || !delivery_city || !delivery_address) {
-      return NextResponse.json({ error: 'Заполните все обязательные поля' }, { status: 400 })
+    if (!customer_name || !customer_phone) {
+      return NextResponse.json({ error: 'Заполните имя и телефон' }, { status: 400 })
+    }
+    
+    // Для доставки требуем город и адрес
+    if (delivery_type === 'delivery' && (!delivery_city || !delivery_address)) {
+      return NextResponse.json({ error: 'Заполните город и адрес доставки' }, { status: 400 })
     }
     
     // Считаем итоговую сумму
@@ -34,8 +39,9 @@ export async function POST(request: NextRequest) {
         customer_name,
         customer_phone,
         customer_email: customer_email || null,
-        delivery_city,
-        delivery_address,
+        delivery_type: delivery_type || 'delivery',
+        delivery_city: delivery_type === 'pickup' ? 'Самовывоз' : delivery_city,
+        delivery_address: delivery_type === 'pickup' ? 'г. Минск, ул. Примерная, 123' : delivery_address,
         delivery_comment: delivery_comment || null,
         total_amount,
         items_count,

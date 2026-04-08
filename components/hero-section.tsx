@@ -59,47 +59,43 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-transparent to-background/80" />
       <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-background/70" />
 
-      {/* Основной контент с параллаксом */}
+      {/* Основной контент с параллаксом - компактный центрированный блок */}
       <div 
-        className="relative flex-1 flex flex-col items-center justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24"
+        className="relative flex-1 flex flex-col items-center justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32"
         style={{ 
           transform: `translateY(${textParallax}px)`,
           willChange: 'transform'
         }}
       >
-        {/* Верхний текст */}
-        <div className="text-center mb-8 lg:mb-12">
-          <p className="text-muted-foreground text-xs sm:text-sm tracking-[0.4em] uppercase mb-4 lg:mb-6">
+        <div className="text-center">
+          {/* Подзаголовок */}
+          <p className="text-muted-foreground text-xs sm:text-sm tracking-[0.4em] uppercase mb-6 sm:mb-8">
             Премиальные диски
           </p>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold text-foreground leading-tight">
-            Совершенство
-          </h1>
-        </div>
-
-        {/* Центральная область - пространство для колеса */}
-        <div className="flex-1 min-h-[200px] sm:min-h-[250px] lg:min-h-[300px]" />
-
-        {/* Нижний текст */}
-        <div className="text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-muted-foreground mb-6 lg:mb-8">
-            в деталях
-          </h2>
           
-          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-lg mx-auto leading-relaxed mb-8">
+          {/* Главный заголовок - единый блок */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold leading-tight mb-2 sm:mb-3">
+            <span className="text-foreground">Совершенство</span>
+            <br />
+            <span className="text-muted-foreground">в деталях</span>
+          </h1>
+          
+          {/* Описание */}
+          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-lg mx-auto leading-relaxed mt-6 sm:mt-8 mb-8 sm:mb-10">
             Откройте коллекцию эксклюзивных литых и кованых дисков от ведущих мировых производителей
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 lg:mb-16">
-            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-8">
+          {/* Кнопка */}
+          <div className="flex justify-center mb-10 sm:mb-14">
+            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-10 py-6 text-base sm:text-lg">
               <Link href="/catalog">
                 Каталог дисков
-                <ArrowRight className="ml-2 w-4 h-4" />
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
           </div>
 
-          {/* Stats */}
+          {/* Статистика */}
           <div className="grid grid-cols-3 gap-6 sm:gap-12 max-w-md mx-auto">
             <div>
               <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">500+</p>
@@ -117,10 +113,10 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground animate-bounce">
-        <span className="text-xs tracking-widest uppercase">Прокрутите</span>
-        <ChevronDown className="w-5 h-5" />
+      {/* Scroll indicator - с отступом чтобы не налазил на контент */}
+      <div className="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground/70 animate-bounce">
+        <span className="text-[10px] sm:text-xs tracking-widest uppercase">Прокрутите</span>
+        <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
       </div>
     </section>
   )
