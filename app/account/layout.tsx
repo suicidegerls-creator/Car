@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { User, ShoppingBag, Heart, Headphones, LogOut, ArrowLeft, Menu, X } from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { User, ShoppingBag, Heart, Headphones, LogOut, ArrowLeft, Menu, X, Lock, Loader2 } from 'lucide-react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 const navItems = [
@@ -17,6 +18,7 @@ const navItems = [
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [loading, setLoading] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
@@ -26,6 +28,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
+      setLoading(false)
     }
     getUser()
   }, [supabase.auth])
@@ -34,6 +37,47 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
     await supabase.auth.signOut()
     router.push('/')
     router.refresh()
+  }
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  // Show auth required screen for non-authenticated users
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="mx-auto w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-4">
+              <Lock className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <CardTitle className="text-2xl">Требуется авторизация</CardTitle>
+            <CardDescription>
+              Для доступа к личному кабинету и избранному необходимо войти в аккаунт или зарегистрироваться
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button asChild className="w-full" size="lg">
+              <Link href="/auth/login">Войти в аккаунт</Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full" size="lg">
+              <Link href="/auth/sign-up">Зарегистрироваться</Link>
+            </Button>
+            <div className="text-center">
+              <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Вернуться на главную
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (

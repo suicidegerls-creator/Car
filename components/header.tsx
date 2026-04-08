@@ -10,8 +10,8 @@ import type { User as SupabaseUser } from "@supabase/supabase-js"
 
 const navItems = [
   { name: "Каталог", href: "/catalog" },
+  { name: "AR-примерка", href: "/ar-fitting" },
   { name: "Бренды", href: "/#brands" },
-  { name: "О нас", href: "/#about" },
   { name: "Контакты", href: "/#contacts" },
 ]
 

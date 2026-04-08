@@ -10,15 +10,16 @@ import {
   ChevronLeft,
   ChevronRight,
   ShoppingCart,
-  Heart,
   Phone,
   Package,
   Truck,
   Shield,
   Check,
+  Camera,
 } from 'lucide-react'
 import { Wheel, WHEEL_TYPE_LABELS } from '@/lib/types/wheel'
 import { AddToCartButton } from '@/components/cart/add-to-cart-button'
+import { FavoriteButton } from '@/components/catalog/favorite-button'
 import { useViewHistory } from '@/hooks/use-view-history'
 import { Recommendations } from './recommendations'
 
@@ -208,13 +209,22 @@ export function ProductDetails({ wheel }: ProductDetailsProps) {
 
           <div className="flex flex-col sm:flex-row gap-3">
             <AddToCartButton wheel={wheel} size="lg" className="flex-1" />
-            <Button size="lg" variant="outline">
-              <Heart className="w-5 h-5" />
-            </Button>
+            <FavoriteButton 
+              wheelId={wheel.id} 
+              wheelName={wheel.name} 
+              size="lg" 
+              variant="outline"
+            />
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <Button variant="secondary" className="flex-1" asChild>
+              <Link href={`/ar-fitting?wheel=${wheel.id}`}>
+                <Camera className="w-4 h-4 mr-2" />
+                AR-примерка
+              </Link>
+            </Button>
+            <Button variant="outline" className="flex-1" asChild>
               <a href="tel:+375291234567">
                 <Phone className="w-4 h-4 mr-2" />
                 Позвонить

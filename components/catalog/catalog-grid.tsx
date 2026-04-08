@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Package, Eye } from 'lucide-react'
 import { Wheel, WHEEL_TYPE_LABELS } from '@/lib/types/wheel'
 import { AddToCartButton } from '@/components/cart/add-to-cart-button'
+import { FavoriteButton } from '@/components/catalog/favorite-button'
 import { Button } from '@/components/ui/button'
 
 interface CatalogGridProps {
@@ -147,6 +148,20 @@ function InteractiveCard({ wheel }: { wheel: Wheel }) {
                 -{Math.round((1 - wheel.price / wheel.old_price) * 100)}%
               </Badge>
             )}
+            
+            {/* Favorite button */}
+            <div 
+              className="absolute top-3 right-3 z-20"
+              onClick={(e) => e.preventDefault()}
+            >
+              <FavoriteButton 
+                wheelId={wheel.id} 
+                wheelName={wheel.name}
+                size="icon"
+                variant="ghost"
+                className="bg-background/80 backdrop-blur-sm hover:bg-background h-8 w-8"
+              />
+            </div>
           </div>
           <CardContent className="p-2 sm:p-4">
             <div className="flex items-start justify-between gap-1 mb-1 sm:mb-2">
