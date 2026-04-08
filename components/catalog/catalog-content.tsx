@@ -8,8 +8,7 @@ import { CatalogPagination } from './catalog-pagination'
 import { Wheel } from '@/lib/types/wheel'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { SlidersHorizontal, X } from 'lucide-react'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet'
+import { X } from 'lucide-react'
 import { CatalogSkeleton } from './catalog-skeleton'
 
 // Wrapper with Suspense for useSearchParams
@@ -28,7 +27,6 @@ function CatalogContentInner() {
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
-  const [filtersOpen, setFiltersOpen] = useState(false)
 
   const page = parseInt(searchParams.get('page') || '1')
   const sortBy = searchParams.get('sort_by') || 'created_at'
@@ -85,92 +83,50 @@ function CatalogContentInner() {
   ).length
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 overflow-hidden">
-      {/* Desktop Filters */}
-      <aside className="hidden lg:block w-72 flex-shrink-0">
-        <div className="sticky top-24">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold">Фильтры</h2>
-            {activeFiltersCount > 0 && (
-              <Button variant="ghost" size="sm" onClick={clearFilters}>
-                Сбросить
-              </Button>
-            )}
-          </div>
-          <CatalogFilters
-            searchParams={searchParams}
-            updateParams={updateParams}
-          />
+    <div className="flex flex-col gap-6">
+      {/* Filters Panel - Always visible */}
+      <div className="w-full">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-lg">Подбор дисков</h2>
+          {activeFiltersCount > 0 && (
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground hover:text-foreground">
+              <X className="w-4 h-4 mr-1" />
+              Сбросить ({activeFiltersCount})
+            </Button>
+          )}
         </div>
-      </aside>
+        <CatalogFilters
+          searchParams={searchParams}
+          updateParams={updateParams}
+        />
+      </div>
 
-      {/* Main Content */}
+      {/* Results section */}
       <div className="flex-1">
-        {/* Mobile Filters & Sort */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
-          <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" className="lg:hidden">
-                <SlidersHorizontal className="w-4 h-4 mr-2" />
-                Фильтры
-                {activeFiltersCount > 0 && (
-                  <span className="ml-2 w-5 h-5 bg-foreground text-background text-xs rounded-full flex items-center justify-center">
-                    {activeFiltersCount}
-                  </span>
-                )}
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-80 overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle className="flex items-center justify-between">
-                  Фильтры
-                  {activeFiltersCount > 0 && (
-                    <Button variant="ghost" size="sm" onClick={() => { clearFilters(); setFiltersOpen(false); }}>
-                      <X className="w-4 h-4 mr-1" />
-                      Сбросить
-                    </Button>
-                  )}
-                </SheetTitle>
-                <SheetDescription className="sr-only">
-                  Настройка фильтров для поиска дисков
-                </SheetDescription>
-              </SheetHeader>
-              <div className="mt-6">
-                <CatalogFilters
-                  searchParams={searchParams}
-                  updateParams={(updates) => {
-                    updateParams(updates)
-                    setFiltersOpen(false)
-                  }}
-                />
-              </div>
-            </SheetContent>
-          </Sheet>
-
-          <div className="flex-1 flex flex-wrap items-center justify-between gap-2">
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Найдено: <span className="font-medium text-foreground">{total}</span>
-            </p>
-            <Select
-              value={`${sortBy}-${sortOrder}`}
-              onValueChange={(value) => {
-                const [newSortBy, newSortOrder] = value.split('-')
-                updateParams({ sort_by: newSortBy, sort_order: newSortOrder })
-              }}
-            >
-              <SelectTrigger className="w-[140px] sm:w-[180px] text-xs sm:text-sm">
-                <SelectValue placeholder="Сортировка" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="created_at-desc">Сначала новые</SelectItem>
-                <SelectItem value="created_at-asc">Сначала старые</SelectItem>
-                <SelectItem value="price-asc">Сначала дешевые</SelectItem>
-                <SelectItem value="price-desc">Сначала дорогие</SelectItem>
-                <SelectItem value="name-asc">По названию А-Я</SelectItem>
-                <SelectItem value="name-desc">По названию Я-А</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Sort & Count */}
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4 sm:mb-6">
+          <p className="text-sm text-muted-foreground">
+            Найдено: <span className="font-medium text-foreground">{total}</span> дисков
+          </p>
+          <Select
+            value={`${sortBy}-${sortOrder}`}
+            onValueChange={(value) => {
+              const [newSortBy, newSortOrder] = value.split('-')
+              updateParams({ sort_by: newSortBy, sort_order: newSortOrder })
+            }}
+          >
+            <SelectTrigger className="w-[160px] sm:w-[180px] text-sm">
+              <SelectValue placeholder="Сортировка" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="created_at-desc">Сначала новые</SelectItem>
+              <SelectItem value="created_at-asc">Сначала старые</SelectItem>
+              <SelectItem value="price-asc">Сначала дешевые</SelectItem>
+              <SelectItem value="price-desc">Сначала дорогие</SelectItem>
+              <SelectItem value="name-asc">По названию А-Я</SelectItem>
+              <SelectItem value="name-desc">По названию Я-А</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Grid */}
