@@ -17,7 +17,7 @@ import {
   SelectValue 
 } from '@/components/ui/select'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Loader2, ShoppingBag, CheckCircle, Truck, Phone, MapPin, Store } from 'lucide-react'
+import { Loader2, ShoppingBag, CheckCircle, Truck, Phone, MapPin, Store, Banknote, CreditCard } from 'lucide-react'
 import Link from 'next/link'
 
 const CITIES = [
@@ -60,7 +60,11 @@ export function CheckoutForm() {
     delivery_city: '',
     delivery_address: '',
     delivery_comment: '',
+    payment_method: 'cash' as 'cash' | 'card',
   })
+  
+  // Стоимость доставки (бесплатно при заказе от 500 BYN или самовывозе)
+  const deliveryCost = formData.delivery_type === 'pickup' ? 0 : (getTotalPrice() >= 500 ? 0 : 30)
 
   useEffect(() => {
     setMounted(true)
@@ -314,6 +318,62 @@ export function CheckoutForm() {
             </CardContent>
           </Card>
 
+          {/* Способ оплаты */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Banknote className="w-5 h-5" />
+                Способ оплаты
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <RadioGroup
+                value={formData.payment_method}
+                onValueChange={(v) => handleChange('payment_method', v)}
+                className="grid grid-cols-2 gap-4"
+              >
+                <Label
+                  htmlFor="cash"
+                  className={`flex flex-col items-center gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
+                    formData.payment_method === 'cash' 
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-border hover:border-muted-foreground'
+                  }`}
+                >
+                  <RadioGroupItem value="cash" id="cash" className="sr-only" />
+                  <Banknote className="w-8 h-8" />
+                  <div className="text-center">
+                    <p className="font-medium">Наличными</p>
+                    <p className="text-xs text-muted-foreground">При получении</p>
+                  </div>
+                </Label>
+                <Label
+                  htmlFor="card"
+                  className={`flex flex-col items-center gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
+                    formData.payment_method === 'card' 
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-border hover:border-muted-foreground'
+                  }`}
+                >
+                  <RadioGroupItem value="card" id="card" className="sr-only" />
+                  <CreditCard className="w-8 h-8" />
+                  <div className="text-center">
+                    <p className="font-medium">Картой</p>
+                    <p className="text-xs text-muted-foreground">При получении</p>
+                  </div>
+                </Label>
+              </RadioGroup>
+              
+              <div className="bg-muted/50 p-4 rounded-lg text-sm text-muted-foreground">
+                {formData.payment_method === 'cash' ? (
+                  <p>Оплата наличными {formData.delivery_type === 'pickup' ? 'в магазине при самовывозе' : 'курьеру при получении заказа'}.</p>
+                ) : (
+                  <p>Оплата банковской картой {formData.delivery_type === 'pickup' ? 'в магазине при самовывозе' : 'курьеру при получении заказа'}. Курьер приедет с терминалом.</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           {error && (
             <div className="bg-destructive/10 text-destructive p-4 rounded-lg">
               {error}
@@ -381,27 +441,33 @@ export function CheckoutForm() {
                 <span>{totalItems} шт.</span>
               </div>
               <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Сумма товаров:</span>
+                <span>{totalPrice.toLocaleString('be-BY')} BYN</span>
+              </div>
+              <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">
                   {formData.delivery_type === 'pickup' ? 'Самовывоз:' : 'Доставка:'}
                 </span>
-                <span>
-                  {formData.delivery_type === 'pickup' 
-                    ? 'Бесплатно' 
-                    : totalPrice >= 500 ? 'Бесплатно' : 'Рассчитывается'}
+                <span className={deliveryCost === 0 ? 'text-green-600' : ''}>
+                  {deliveryCost === 0 ? 'Бесплатно' : `${deliveryCost} BYN`}
                 </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Оплата:</span>
+                <span>{formData.payment_method === 'cash' ? 'Наличными' : 'Картой'}</span>
               </div>
             </div>
 
             <Separator />
 
             <div className="flex justify-between items-center">
-              <span className="font-medium">Итого:</span>
+              <span className="font-medium">Итого к оплате:</span>
               <span className="text-xl font-bold">
-                {totalPrice.toLocaleString('be-BY')} BYN
+                {(totalPrice + deliveryCost).toLocaleString('be-BY')} BYN
               </span>
             </div>
 
-            {totalPrice >= 500 && (
+            {deliveryCost === 0 && formData.delivery_type === 'delivery' && (
               <div className="bg-green-500/10 text-green-600 text-sm p-3 rounded-lg text-center">
                 Бесплатная доставка при заказе от 500 BYN
               </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { Toaster } from 'sonner'
 import { SupportWidget } from '@/components/support/support-widget'
 import { SupportProvider } from '@/lib/contexts/support-context'
 import './globals.css'
@@ -43,6 +44,12 @@ export default function RootLayout({
           {children}
           <SupportWidget />
         </SupportProvider>
+        <Toaster 
+          position="bottom-right" 
+          richColors 
+          closeButton
+          theme="dark"
+        />
         <Analytics />
       </body>
     </html>

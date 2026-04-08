@@ -87,10 +87,10 @@ export function HeroSection() {
 
           {/* Кнопка */}
           <div className="flex justify-center mb-10 sm:mb-14">
-            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-10 py-6 text-base sm:text-lg">
+            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-8">
               <Link href="/catalog">
                 Каталог дисков
-                <ArrowRight className="ml-2 w-5 h-5" />
+                <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             </Button>
           </div>

@@ -18,9 +18,12 @@ export interface Order {
   customer_name: string
   customer_phone: string
   customer_email?: string
+  delivery_type: 'delivery' | 'pickup'
   delivery_city: string
   delivery_address: string
   delivery_comment?: string
+  delivery_cost: number
+  payment_method: 'cash' | 'card'
   total_amount: number
   items_count: number
   created_at: string

@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { RefreshCw, Eye, Package, Phone, Mail, MapPin, MessageSquare } from 'lucide-react'
+import { RefreshCw, Eye, Package, Phone, Mail, MapPin, MessageSquare, Banknote, CreditCard, Truck, Store } from 'lucide-react'
 import { Order, OrderItem, ORDER_STATUS_LABELS } from '@/lib/types/order'
 
 export function OrdersManagement() {
@@ -312,18 +312,44 @@ export function OrdersManagement() {
                 </CardContent>
               </Card>
 
-              {/* Delivery Info */}
+              {/* Delivery & Payment Info */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Адрес доставки</CardTitle>
+                  <CardTitle className="text-base">Доставка и оплата</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    {selectedOrder.delivery_type === 'pickup' ? (
+                      <>
+                        <Store className="w-4 h-4 text-muted-foreground" />
+                        <span className="font-medium">Самовывоз</span>
+                      </>
+                    ) : (
+                      <>
+                        <Truck className="w-4 h-4 text-muted-foreground" />
+                        <span className="font-medium">Доставка</span>
+                      </>
+                    )}
+                  </div>
                   <div className="flex items-start gap-2 text-muted-foreground">
                     <MapPin className="w-4 h-4 mt-0.5" />
                     <div>
                       <p className="font-medium text-foreground">{selectedOrder.delivery_city}</p>
                       <p>{selectedOrder.delivery_address}</p>
                     </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {selectedOrder.payment_method === 'card' ? (
+                      <>
+                        <CreditCard className="w-4 h-4 text-muted-foreground" />
+                        <span>Оплата картой при получении</span>
+                      </>
+                    ) : (
+                      <>
+                        <Banknote className="w-4 h-4 text-muted-foreground" />
+                        <span>Оплата наличными при получении</span>
+                      </>
+                    )}
                   </div>
                   {selectedOrder.delivery_comment && (
                     <div className="flex items-start gap-2 text-muted-foreground">
