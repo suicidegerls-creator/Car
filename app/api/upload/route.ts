@@ -1,23 +1,18 @@
-import { put } from '@vercel/blob'
 import { type NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import sharp from 'sharp'
 
 // Настройки оптимизации изображений
 const IMAGE_CONFIG = {
-  maxWidth: 1200,      // Максимальная ширина
-  maxHeight: 1200,     // Максимальная высота
-  quality: 85,         // Качество JPEG/WebP
-  format: 'webp' as const,  // Формат для конвертации
-}
-
-// Размеры для разных вариантов изображений
-const IMAGE_SIZES = {
-  full: { width: 1200, height: 1200 },
-  thumb: { width: 400, height: 400 },
+  maxWidth: 1200,
+  maxHeight: 1200,
+  quality: 85,
 }
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createClient()
+    
     const formData = await request.formData()
     const file = formData.get('file') as File
 
@@ -31,7 +26,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid file type. Allowed: JPEG, PNG, WebP, GIF, AVIF' }, { status: 400 })
     }
 
-    // Max 10MB (увеличили лимит для больших фото)
+    // Max 10MB
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json({ error: 'File too large (max 10MB)' }, { status: 400 })
     }
@@ -44,9 +39,6 @@ export async function POST(request: NextRequest) {
     const metadata = await sharp(buffer).metadata()
 
     // Оптимизируем изображение
-    let optimizedBuffer: Buffer
-
-    // Определяем нужно ли изменять размер
     const needsResize = 
       (metadata.width && metadata.width > IMAGE_CONFIG.maxWidth) || 
       (metadata.height && metadata.height > IMAGE_CONFIG.maxHeight)
@@ -60,8 +52,8 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Конвертируем в WebP для оптимального размера
-    optimizedBuffer = await sharpInstance
+    // Конвертируем в WebP
+    const optimizedBuffer = await sharpInstance
       .webp({ quality: IMAGE_CONFIG.quality })
       .toBuffer()
 
@@ -70,19 +62,38 @@ export async function POST(request: NextRequest) {
 
     // Генерируем уникальное имя файла
     const timestamp = Date.now()
-    const baseName = file.name.replace(/\.[^/.]+$/, '') // Убираем расширение
-    const safeBaseName = baseName.replace(/[^a-zA-Z0-9_-]/g, '_') // Безопасное имя
-    const fileName = `wheels/${timestamp}-${safeBaseName}.webp`
+    const baseName = file.name.replace(/\.[^/.]+$/, '')
+    const safeBaseName = baseName.replace(/[^a-zA-Z0-9_-]/g, '_')
+    const fileName = `${timestamp}-${safeBaseName}.webp`
+    const filePath = `wheels/${fileName}`
 
-    // Загружаем оптимизированное изображение (public store для изображений товаров)
-    const blob = await put(fileName, optimizedBuffer, {
-      access: 'public',
-      contentType: 'image/webp',
-    })
+    // Загружаем в Supabase Storage
+    const { data, error } = await supabase.storage
+      .from('images')
+      .upload(filePath, optimizedBuffer, {
+        contentType: 'image/webp',
+        cacheControl: '31536000', // 1 year cache
+        upsert: false,
+      })
+
+    if (error) {
+      // Если bucket не существует, пробуем создать
+      if (error.message.includes('Bucket not found')) {
+        return NextResponse.json({ 
+          error: 'Storage bucket "images" not found. Please create it in Supabase Dashboard.' 
+        }, { status: 500 })
+      }
+      throw error
+    }
+
+    // Получаем публичный URL
+    const { data: urlData } = supabase.storage
+      .from('images')
+      .getPublicUrl(filePath)
 
     return NextResponse.json({ 
-      url: blob.url,
-      pathname: blob.pathname,
+      url: urlData.publicUrl,
+      pathname: filePath,
       width: optimizedMetadata.width,
       height: optimizedMetadata.height,
       size: optimizedBuffer.length,
