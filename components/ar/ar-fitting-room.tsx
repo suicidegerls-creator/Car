@@ -1,56 +1,35 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { ARCamera } from './ar-camera'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { ARPhotoFitting } from './ar-photo-fitting'
 import { WheelSelector } from './wheel-selector'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
   Camera, 
-  Smartphone, 
-  AlertCircle, 
   ChevronLeft,
   Info
 } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { useCart } from '@/hooks/use-cart'
 import type { Wheel } from '@/lib/types/wheel'
 
-type Step = 'intro' | 'select-wheel' | 'camera'
+type Step = 'intro' | 'select-wheel' | 'fitting'
 
 export function ARFittingRoom() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const preselectedWheelId = searchParams.get('wheel')
   
-  const [step, setStep] = useState<Step>(preselectedWheelId ? 'camera' : 'intro')
+  const [step, setStep] = useState<Step>(preselectedWheelId ? 'fitting' : 'intro')
   const [selectedWheel, setSelectedWheel] = useState<Wheel | null>(null)
-  const [isMobile, setIsMobile] = useState(false)
-  const [hasCamera, setHasCamera] = useState(false)
   const [wheels, setWheels] = useState<Wheel[]>([])
   const [loading, setLoading] = useState(true)
-
+  
+  const { addItem } = useCart()
   const supabase = createClient()
-
-  // Check device capabilities
-  useEffect(() => {
-    const checkDevice = async () => {
-      // Check if mobile
-      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-      setIsMobile(mobile)
-
-      // Check camera availability
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices()
-        const videoDevices = devices.filter(device => device.kind === 'videoinput')
-        setHasCamera(videoDevices.length > 0)
-      } catch {
-        setHasCamera(false)
-      }
-    }
-
-    checkDevice()
-  }, [])
 
   // Load wheels
   useEffect(() => {
@@ -81,14 +60,30 @@ export function ARFittingRoom() {
 
   const handleWheelSelect = (wheel: Wheel) => {
     setSelectedWheel(wheel)
-    setStep('camera')
+    setStep('fitting')
   }
 
   const handleBack = () => {
-    if (step === 'camera') {
+    if (step === 'fitting') {
       setStep('select-wheel')
     } else if (step === 'select-wheel') {
       setStep('intro')
+    } else {
+      router.push('/catalog')
+    }
+  }
+
+  const handleAddToCart = () => {
+    if (selectedWheel) {
+      addItem({
+        id: selectedWheel.id,
+        name: selectedWheel.name,
+        price: selectedWheel.price,
+        quantity: 1,
+        image: selectedWheel.images?.[0],
+        brand: selectedWheel.brand,
+        diameter: selectedWheel.diameter,
+      })
     }
   }
 
@@ -106,9 +101,9 @@ export function ARFittingRoom() {
             <div className="mx-auto w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mb-4">
               <Camera className="w-8 h-8 text-accent" />
             </div>
-            <CardTitle className="text-2xl">AR-примерка дисков</CardTitle>
+            <CardTitle className="text-2xl">Примерка дисков на фото</CardTitle>
             <CardDescription>
-              Посмотрите, как диски будут выглядеть на вашем автомобиле с помощью камеры
+              Сфотографируйте ваш автомобиль и примерьте на него диски из нашего каталога
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -130,8 +125,8 @@ export function ARFittingRoom() {
                     <span className="text-sm font-medium text-accent">2</span>
                   </div>
                   <div>
-                    <p className="font-medium">Наведите камеру</p>
-                    <p className="text-sm text-muted-foreground">Направьте камеру на колесо вашего автомобиля</p>
+                    <p className="font-medium">Сделайте фото</p>
+                    <p className="text-sm text-muted-foreground">Сфотографируйте автомобиль сбоку или выберите фото из галереи</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -140,42 +135,16 @@ export function ARFittingRoom() {
                   </div>
                   <div>
                     <p className="font-medium">Примерьте диск</p>
-                    <p className="text-sm text-muted-foreground">Увидьте результат в реальном времени и сделайте фото</p>
+                    <p className="text-sm text-muted-foreground">Перетащите диск на колесо, настройте размер и сохраните результат</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Device check */}
-            {!isMobile && (
-              <div className="flex items-start gap-3 p-4 bg-muted rounded-lg">
-                <Smartphone className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Рекомендуется мобильное устройство</p>
-                  <p className="text-sm text-muted-foreground">
-                    Для лучшего опыта откройте эту страницу на смартфоне или планшете
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {!hasCamera && (
-              <div className="flex items-start gap-3 p-4 bg-destructive/10 rounded-lg">
-                <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-sm">Камера не найдена</p>
-                  <p className="text-sm text-muted-foreground">
-                    Для использования AR-примерки необходима камера
-                  </p>
-                </div>
-              </div>
-            )}
-
             <Button 
               className="w-full" 
               size="lg"
               onClick={() => setStep('select-wheel')}
-              disabled={!hasCamera}
             >
               Начать примерку
             </Button>
@@ -183,7 +152,7 @@ export function ARFittingRoom() {
             <div className="flex items-start gap-2 text-xs text-muted-foreground">
               <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
               <p>
-                Приложение запросит доступ к камере. Ваши данные не сохраняются и не передаются на сервер.
+                Ваши фотографии обрабатываются только на вашем устройстве и не передаются на сервер.
               </p>
             </div>
           </CardContent>
@@ -215,14 +184,13 @@ export function ARFittingRoom() {
     )
   }
 
-  // Camera view
+  // Photo fitting view
   return (
-    <ARCamera 
+    <ARPhotoFitting 
       wheel={selectedWheel}
       onBack={handleBack}
       onChangeWheel={() => setStep('select-wheel')}
-      wheels={wheels}
-      onWheelChange={setSelectedWheel}
+      onAddToCart={handleAddToCart}
     />
   )
 }
