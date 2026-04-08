@@ -67,6 +67,24 @@ export async function POST(request: NextRequest) {
     const fileName = `${timestamp}-${safeBaseName}.webp`
     const filePath = `wheels/${fileName}`
 
+    // Проверяем/создаем bucket
+    const { data: buckets } = await supabase.storage.listBuckets()
+    const imagesBucketExists = buckets?.some(b => b.name === 'images')
+    
+    if (!imagesBucketExists) {
+      const { error: createBucketError } = await supabase.storage.createBucket('images', {
+        public: true,
+        fileSizeLimit: 10485760, // 10MB
+        allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']
+      })
+      
+      if (createBucketError && !createBucketError.message.includes('already exists')) {
+        return NextResponse.json({ 
+          error: 'Failed to create storage bucket: ' + createBucketError.message 
+        }, { status: 500 })
+      }
+    }
+
     // Загружаем в Supabase Storage
     const { data, error } = await supabase.storage
       .from('images')
@@ -77,12 +95,6 @@ export async function POST(request: NextRequest) {
       })
 
     if (error) {
-      // Если bucket не существует, пробуем создать
-      if (error.message.includes('Bucket not found')) {
-        return NextResponse.json({ 
-          error: 'Storage bucket "images" not found. Please create it in Supabase Dashboard.' 
-        }, { status: 500 })
-      }
       throw error
     }
 

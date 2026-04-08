@@ -60,55 +60,74 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
   const { addItem } = useCart()
 
   // Start camera
-  const startCamera = useCallback(async () => {
+  const startCamera = useCallback(async (mode: 'environment' | 'user') => {
     setIsLoading(true)
     setCameraError(null)
 
     try {
-      // Stop existing stream
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop())
+      // Stop existing stream first
+      if (videoRef.current?.srcObject) {
+        const oldStream = videoRef.current.srcObject as MediaStream
+        oldStream.getTracks().forEach(track => track.stop())
+        videoRef.current.srcObject = null
       }
 
+      console.log('[v0] Requesting camera with mode:', mode)
+      
       const newStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: facingMode,
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          facingMode: mode,
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
         },
         audio: false
       })
 
-      setStream(newStream)
+      console.log('[v0] Got stream:', newStream.getVideoTracks().length, 'video tracks')
       
       if (videoRef.current) {
         videoRef.current.srcObject = newStream
-        await videoRef.current.play()
+        
+        // Wait for video to be ready
+        videoRef.current.onloadedmetadata = () => {
+          console.log('[v0] Video metadata loaded')
+          videoRef.current?.play()
+            .then(() => {
+              console.log('[v0] Video playing')
+              setIsLoading(false)
+            })
+            .catch((e) => {
+              console.error('[v0] Video play error:', e)
+              setIsLoading(false)
+            })
+        }
       }
 
-      setIsLoading(false)
+      setStream(newStream)
     } catch (error) {
-      console.error('Camera error:', error)
-      setCameraError('Не удалось получить доступ к камере. Проверьте разрешения.')
+      console.error('[v0] Camera error:', error)
+      setCameraError('Не удалось получить доступ к камере. Проверьте разрешения в настройках браузера.')
       setIsLoading(false)
     }
-  }, [facingMode, stream])
+  }, [])
 
-  // Initialize camera
+  // Initialize camera on mount
   useEffect(() => {
-    startCamera()
+    startCamera(facingMode)
 
     return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop())
+      if (videoRef.current?.srcObject) {
+        const oldStream = videoRef.current.srcObject as MediaStream
+        oldStream.getTracks().forEach(track => track.stop())
       }
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Switch camera
-  const switchCamera = async () => {
-    setFacingMode(prev => prev === 'environment' ? 'user' : 'environment')
-    await startCamera()
+  const switchCamera = () => {
+    const newMode = facingMode === 'environment' ? 'user' : 'environment'
+    setFacingMode(newMode)
+    startCamera(newMode)
   }
 
   // Handle wheel dragging
