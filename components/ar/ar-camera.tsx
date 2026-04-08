@@ -42,7 +42,8 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
   
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [cameraError, setCameraError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
+  const [cameraStarted, setCameraStarted] = useState(false)
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment')
   
   // Wheel positioning state
@@ -59,10 +60,11 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
 
   const { addItem } = useCart()
 
-  // Start camera - simplified version for better mobile compatibility
+  // Start camera - must be called from user interaction for mobile compatibility
   const startCamera = useCallback(async (mode: 'environment' | 'user') => {
     setIsLoading(true)
     setCameraError(null)
+    setCameraStarted(true)
 
     // Stop existing stream first
     if (stream) {
@@ -86,10 +88,13 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
         video.setAttribute('webkit-playsinline', 'true')
         video.muted = true
         
-        // Simple play with error handling
-        video.play().catch(() => {
-          // If autoplay fails, user needs to tap
+        // Wait for video to be ready before playing
+        await new Promise<void>((resolve) => {
+          video.onloadedmetadata = () => resolve()
+          setTimeout(resolve, 2000) // fallback timeout
         })
+        
+        await video.play()
       }
       
       setIsLoading(false)
@@ -109,17 +114,14 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
     }
   }, [stream])
 
-  // Initialize camera on mount
+  // Cleanup on unmount
   useEffect(() => {
-    startCamera(facingMode)
-
     return () => {
-      if (videoRef.current?.srcObject) {
-        const oldStream = videoRef.current.srcObject as MediaStream
-        oldStream.getTracks().forEach(track => track.stop())
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop())
       }
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [stream])
 
   // Switch camera
   const switchCamera = () => {
@@ -325,6 +327,56 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
               В корзину
             </Button>
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show start screen if camera not started yet
+  if (!cameraStarted) {
+    return (
+      <div className="fixed inset-0 bg-background flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b">
+          <Button variant="ghost" size="icon" onClick={onBack}>
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="font-semibold">AR-примерка</h1>
+          <div className="w-10" />
+        </div>
+        
+        {/* Content */}
+        <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
+          {wheel && wheel.images && wheel.images.length > 0 && (
+            <div className="w-40 h-40 relative">
+              <Image
+                src={wheel.images[0]}
+                alt={wheel.name}
+                fill
+                className="object-contain"
+              />
+            </div>
+          )}
+          
+          <div className="text-center space-y-2">
+            <h2 className="text-xl font-bold">{wheel?.name || 'Выберите диск'}</h2>
+            <p className="text-muted-foreground">
+              Нажмите кнопку ниже, чтобы открыть камеру и примерить диск на ваш автомобиль
+            </p>
+          </div>
+          
+          <Button 
+            size="lg" 
+            className="gap-2"
+            onClick={() => startCamera(facingMode)}
+          >
+            <Camera className="w-5 h-5" />
+            Открыть камеру
+          </Button>
+          
+          <Button variant="outline" onClick={onChangeWheel}>
+            Выбрать другой диск
+          </Button>
         </div>
       </div>
     )
