@@ -25,34 +25,38 @@ interface OrderNotification {
 }
 
 export async function sendOrderNotification(order: OrderNotification): Promise<boolean> {
+  console.log('[v0] Telegram notification called for order:', order.orderId)
+  console.log('[v0] TELEGRAM_BOT_TOKEN exists:', !!TELEGRAM_BOT_TOKEN)
+  console.log('[v0] TELEGRAM_CHAT_ID exists:', !!TELEGRAM_CHAT_ID)
+  
   if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-    console.error('Telegram credentials not configured')
+    console.error('[v0] Telegram credentials not configured - BOT_TOKEN:', !!TELEGRAM_BOT_TOKEN, 'CHAT_ID:', !!TELEGRAM_CHAT_ID)
     return false
   }
 
   // Формируем список товаров
   const itemsList = order.items
-    .map(item => `• ${item.name} — ${item.quantity} шт. — ${item.price.toLocaleString('ru-RU')} BYN`)
+    .map(item => `  - ${item.name} x ${item.quantity} шт. = ${item.price} BYN`)
     .join('\n')
 
-  // Формируем сообщение
+  // Формируем сообщение (без Markdown для избежания ошибок парсинга)
   const message = `
-🛒 *Новый заказ #${order.orderId.slice(0, 8)}*
+НОВЫЙ ЗАКАЗ #${order.orderId.slice(0, 8)}
 
-👤 *Клиент:* ${escapeMarkdown(order.customerName)}
-📱 *Телефон:* ${escapeMarkdown(order.customerPhone)}
-${order.customerEmail ? `📧 *Email:* ${escapeMarkdown(order.customerEmail)}` : ''}
+Клиент: ${order.customerName}
+Телефон: ${order.customerPhone}
+${order.customerEmail ? `Email: ${order.customerEmail}` : ''}
 
-📦 *Способ получения:* ${order.deliveryType === 'pickup' ? 'Самовывоз' : 'Доставка'}
-${order.deliveryType === 'delivery' ? `📍 *Адрес:* ${escapeMarkdown(order.deliveryCity || '')}${order.deliveryAddress ? ', ' + escapeMarkdown(order.deliveryAddress) : ''}` : '📍 *Адрес:* г. Минск, ул. Примерная, 123'}
-💳 *Оплата:* ${order.paymentMethod === 'cash' ? 'Наличными' : 'Картой'} при получении
-${order.deliveryComment ? `💬 *Комментарий:* ${escapeMarkdown(order.deliveryComment)}` : ''}
+Способ: ${order.deliveryType === 'pickup' ? 'Самовывоз' : 'Доставка'}
+Адрес: ${order.deliveryType === 'delivery' ? `${order.deliveryCity || ''}, ${order.deliveryAddress || ''}` : 'г. Минск, ул. Примерная, 123'}
+Оплата: ${order.paymentMethod === 'cash' ? 'Наличными' : 'Картой'} при получении
+${order.deliveryComment ? `Комментарий: ${order.deliveryComment}` : ''}
 
-🛞 *Товары:*
+Товары:
 ${itemsList}
 
-${order.deliveryCost > 0 ? `🚚 *Доставка:* ${order.deliveryCost} BYN` : '🚚 *Доставка:* Бесплатно'}
-💰 *Итого:* ${order.totalAmount.toLocaleString('ru-RU')} BYN
+Доставка: ${order.deliveryCost > 0 ? order.deliveryCost + ' BYN' : 'Бесплатно'}
+ИТОГО: ${order.totalAmount} BYN
 `.trim()
 
   // Кнопки
@@ -88,18 +92,19 @@ ${order.deliveryCost > 0 ? `🚚 *Доставка:* ${order.deliveryCost} BYN` 
       body: JSON.stringify({
         chat_id: TELEGRAM_CHAT_ID,
         text: message,
-        parse_mode: 'Markdown',
         reply_markup: keyboard,
       }),
     })
 
     const result = await response.json()
+    console.log('[v0] Telegram API response:', JSON.stringify(result))
     
     if (!result.ok) {
-      console.error('Telegram API error:', result)
+      console.error('[v0] Telegram API error:', result)
       return false
     }
 
+    console.log('[v0] Telegram notification sent successfully')
     return true
   } catch (error) {
     console.error('Failed to send Telegram notification:', error)
