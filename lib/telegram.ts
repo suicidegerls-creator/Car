@@ -59,18 +59,12 @@ ${itemsList}
 ИТОГО: ${order.totalAmount} BYN
 `.trim()
 
-  // Кнопки (tel: URL не поддерживается в Telegram inline кнопках)
+  // Кнопка для перехода в админку
   const keyboard = {
     inline_keyboard: [
       [
         {
-          text: 'Подтвердить заказ',
-          callback_data: `confirm_order:${order.orderId}`
-        }
-      ],
-      [
-        {
-          text: 'Открыть в админке',
+          text: 'Открыть',
           url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://car-two-beta-48.vercel.app'}/admin?token=rimzone-admin-2024`
         }
       ]
