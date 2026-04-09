@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
   
   try {
     const body = await request.json()
+    console.log('[v0] Order request body:', JSON.stringify(body, null, 2))
     const { items, customer_name, customer_phone, customer_email, delivery_type, delivery_city, delivery_address, delivery_comment, payment_method } = body
     
     // Валидация
@@ -57,9 +58,11 @@ export async function POST(request: NextRequest) {
       .single()
     
     if (orderError) {
-      console.error('Order creation error:', orderError)
-      return NextResponse.json({ error: 'Ошибка создания заказа' }, { status: 500 })
+      console.error('[v0] Order creation error:', orderError)
+      return NextResponse.json({ error: 'Ошибка создания заказа: ' + orderError.message }, { status: 500 })
     }
+    
+    console.log('[v0] Order created:', order.id)
     
     // Добавляем товары в заказ
     const orderItems = items.map((item: {
@@ -100,25 +103,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Ошибка добавления товаров' }, { status: 500 })
     }
     
-    // Отправляем уведомление в Telegram
-    await sendOrderNotification({
-      orderId: order.id,
-      customerName: customer_name,
-      customerPhone: customer_phone,
-      customerEmail: customer_email,
-      deliveryType: delivery_type || 'delivery',
-      deliveryCity: delivery_type === 'pickup' ? 'Самовывоз' : delivery_city,
-      deliveryAddress: delivery_type === 'pickup' ? 'г. Минск, ул. Примерная, 123' : delivery_address,
-      deliveryComment: delivery_comment,
-      paymentMethod: payment_method || 'cash',
-      items: items.map((item: { wheel_name: string; quantity: number; price: number }) => ({
-        name: item.wheel_name,
-        quantity: item.quantity,
-        price: item.price,
-      })),
-      deliveryCost: delivery_cost,
-      totalAmount: total_amount,
-    })
+    // Отправляем уведомление в Telegram (не блокируем создание заказа если не получилось)
+    try {
+      await sendOrderNotification({
+        orderId: order.id,
+        customerName: customer_name,
+        customerPhone: customer_phone,
+        customerEmail: customer_email,
+        deliveryType: delivery_type || 'delivery',
+        deliveryCity: delivery_type === 'pickup' ? 'Самовывоз' : delivery_city,
+        deliveryAddress: delivery_type === 'pickup' ? 'г. Минск, ул. Примерная, 123' : delivery_address,
+        deliveryComment: delivery_comment,
+        paymentMethod: payment_method || 'cash',
+        items: items.map((item: { wheel_name: string; quantity: number; price: number }) => ({
+          name: item.wheel_name,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        deliveryCost: delivery_cost,
+        totalAmount: total_amount,
+      })
+    } catch (telegramError) {
+      console.error('Telegram notification error:', telegramError)
+      // Не блокируем создание заказа если Telegram недоступен
+    }
     
     return NextResponse.json({ 
       success: true, 
