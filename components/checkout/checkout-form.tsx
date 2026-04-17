@@ -192,7 +192,7 @@ export function CheckoutForm() {
                   <Input
                     id="customer_phone"
                     type="tel"
-                    placeholder="+375 (29) 123-45-67"
+                    placeholder="+375 (29) 657-69-60"
                     value={formData.customer_phone}
                     onChange={(e) => handleChange('customer_phone', e.target.value)}
                     required
@@ -262,13 +262,13 @@ export function CheckoutForm() {
                 <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                   <p className="font-medium">Адрес самовывоза:</p>
                   <p className="text-sm text-muted-foreground">
-                    г. Минск, ул. Примерная, 123
+                    АвтоМолл, павильон 276, Щомыслицкий сельсовет, 126
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Режим работы: Пн-Сб 9:00 - 19:00
+                    Режим работы: Вт-Вс 9:00 - 17:00
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Телефон: +375 (29) 123-45-67
+                    Телефон: +375 (29) 657-69-60
                   </p>
                 </div>
               ) : (

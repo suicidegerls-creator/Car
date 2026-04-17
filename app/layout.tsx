@@ -10,9 +10,32 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'RIMZONE — Премиальные диски для вашего авто',
-  description: 'Каталог премиальных автомобильных дисков. Широкий ассортимент литых, кованых и штампованных дисков от ведущих брендов.',
+  metadataBase: new URL('https://car-two-beta-48.vercel.app'),
+  title: {
+    default: 'RIMZONE — Премиальные литые диски в Минске',
+    template: '%s | RIMZONE',
+  },
+  description: 'Магазин премиальных литых дисков в Минске. Оригинальная продукция BBS, OZ Racing, Enkei, Vossen. Доставка по Беларуси. +375 (29) 657-69-60',
+  keywords: ['литые диски', 'диски Минск', 'автомобильные диски', 'BBS', 'OZ Racing', 'купить диски Беларусь', 'кованые диски'],
+  authors: [{ name: 'RIMZONE' }],
   generator: 'v0.app',
+  openGraph: {
+    type: 'website',
+    locale: 'ru_BY',
+    url: 'https://car-two-beta-48.vercel.app',
+    siteName: 'RIMZONE',
+    title: 'RIMZONE — Премиальные литые диски в Минске',
+    description: 'Магазин премиальных литых дисков в Минске. Оригинальная продукция от ведущих мировых производителей.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'RIMZONE — Премиальные литые диски',
+    description: 'Магазин премиальных литых дисков в Минске',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   icons: {
     icon: [
       {
@@ -38,7 +61,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="ru">
       <body className="font-sans antialiased">
         <SupportProvider>
           {children}

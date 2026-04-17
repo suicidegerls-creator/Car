@@ -11,8 +11,8 @@ import type { User as SupabaseUser } from "@supabase/supabase-js"
 const navItems = [
   { name: "Каталог", href: "/catalog" },
   { name: "AR-примерка", href: "/ar-fitting" },
-  { name: "Бренды", href: "/#brands" },
-  { name: "Контакты", href: "/#contacts" },
+  { name: "О компании", href: "/about" },
+  { name: "Контакты", href: "/contacts" },
 ]
 
 export function Header() {

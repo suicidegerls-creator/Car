@@ -149,3 +149,70 @@ export async function sendOrderStatusUpdate(
 function escapeMarkdown(text: string): string {
   return text.replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&')
 }
+
+// Уведомление о новом обращении в поддержку
+interface SupportNotification {
+  requestId: string
+  customerName: string
+  customerPhone: string
+  customerEmail?: string
+  subject: string
+  message: string
+}
+
+export async function sendSupportNotification(request: SupportNotification): Promise<boolean> {
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+    console.error('[v0] Telegram credentials not configured')
+    return false
+  }
+
+  const message = `
+НОВОЕ ОБРАЩЕНИЕ #${request.requestId.slice(0, 8)}
+
+Тема: ${request.subject}
+
+Клиент: ${request.customerName}
+Телефон: ${request.customerPhone}
+${request.customerEmail ? `Email: ${request.customerEmail}` : ''}
+
+Сообщение:
+${request.message}
+`.trim()
+
+  const keyboard = {
+    inline_keyboard: [
+      [
+        {
+          text: 'Открыть',
+          url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://car-two-beta-48.vercel.app'}/admin?token=rimzone-admin-2024&tab=support`
+        }
+      ]
+    ]
+  }
+
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        reply_markup: keyboard,
+      }),
+    })
+
+    const result = await response.json()
+    
+    if (!result.ok) {
+      console.error('[v0] Telegram API error:', result)
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error('Failed to send support notification:', error)
+    return false
+  }
+}

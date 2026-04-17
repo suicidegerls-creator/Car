@@ -32,9 +32,11 @@ export function CTASection() {
               Получить консультацию
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
-            <Button size="lg" variant="outline" className="border-border hover:bg-secondary">
-              <Phone className="mr-2 w-4 h-4" />
-              +375 (29) 123-45-67
+            <Button size="lg" variant="outline" className="border-border hover:bg-secondary" asChild>
+              <a href="tel:+375296576960">
+                <Phone className="mr-2 w-4 h-4" />
+                +375 (29) 657-69-60
+              </a>
             </Button>
           </div>
 

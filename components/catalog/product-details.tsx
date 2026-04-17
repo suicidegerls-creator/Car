@@ -225,7 +225,7 @@ export function ProductDetails({ wheel }: ProductDetailsProps) {
               </Link>
             </Button>
             <Button variant="outline" className="flex-1" asChild>
-              <a href="tel:+375291234567">
+              <a href="tel:+375296576960">
                 <Phone className="w-4 h-4 mr-2" />
                 Позвонить
               </a>

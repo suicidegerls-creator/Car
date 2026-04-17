@@ -6,22 +6,20 @@ import { Button } from "@/components/ui/button"
 
 const footerLinks = {
   catalog: [
-    { name: "Литые диски", href: "#" },
-    { name: "Кованые диски", href: "#" },
-    { name: "Штампованные диски", href: "#" },
-    { name: "Эксклюзивные модели", href: "#" },
+    { name: "Все диски", href: "/catalog" },
+    { name: "AR-примерка", href: "/ar-fitting" },
+    { name: "Бренды", href: "/#brands" },
   ],
   company: [
-    { name: "О компании", href: "#about" },
-    { name: "Доставка и оплата", href: "#" },
-    { name: "Гарантия", href: "#" },
-    { name: "Контакты", href: "#contacts" },
+    { name: "О компании", href: "/about" },
+    { name: "Доставка и оплата", href: "/delivery" },
+    { name: "Гарантия", href: "/warranty" },
+    { name: "Контакты", href: "/contacts" },
   ],
-  support: [
-    { name: "Подбор по авто", href: "#" },
-    { name: "FAQ", href: "#" },
-    { name: "Блог", href: "#" },
-    { name: "Отзывы", href: "#" },
+  contacts: [
+    { name: "+375 (29) 657-69-60", href: "tel:+375296576960" },
+    { name: "АвтоМолл, павильон 276", href: "/contacts" },
+    { name: "Вт-Вс: 9:00 - 17:00", href: "/contacts" },
   ],
 }
 
@@ -91,9 +89,9 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Поддержка</h4>
+            <h4 className="font-semibold text-foreground mb-4">Контакты</h4>
             <ul className="space-y-3">
-              {footerLinks.support.map((link) => (
+              {footerLinks.contacts.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}

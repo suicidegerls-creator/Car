@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { sendSupportNotification } from '@/lib/telegram'
 
 // GET - получить все обращения
 export async function GET(request: NextRequest) {
@@ -54,6 +55,20 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  // Отправляем уведомление в Telegram
+  try {
+    await sendSupportNotification({
+      requestId: data.id,
+      customerName: customer_name,
+      customerPhone: customer_phone,
+      customerEmail: customer_email,
+      subject,
+      message,
+    })
+  } catch (telegramError) {
+    console.error('Telegram notification error:', telegramError)
   }
 
   return NextResponse.json(data)
