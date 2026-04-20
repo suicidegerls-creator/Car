@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   const { data: wheel } = await supabase
     .from('wheels')
-    .select('name, brand, meta_title, meta_description')
+    .select('name, brand, price, images, meta_title, meta_description')
     .eq('id', id)
     .single()
 
@@ -24,9 +24,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Товар не найден | RIMZONE' }
   }
 
+  const title = wheel.meta_title || `${wheel.name} | ${wheel.brand} | RIMZONE`
+  const description = wheel.meta_description || `Купить ${wheel.name} от ${wheel.brand} в магазине RIMZONE. Цена: ${wheel.price} BYN`
+  const image = wheel.images?.[0] || null
+
   return {
-    title: wheel.meta_title || `${wheel.name} | ${wheel.brand} | RIMZONE`,
-    description: wheel.meta_description || `Купить ${wheel.name} от ${wheel.brand} в магазине RIMZONE`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      locale: 'ru_BY',
+      siteName: 'RIMZONE',
+      ...(image && { images: [{ url: image, width: 800, height: 800, alt: wheel.name }] }),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      ...(image && { images: [image] }),
+    },
   }
 }
 
@@ -44,8 +62,38 @@ export default async function ProductPage({ params }: Props) {
     notFound()
   }
 
+  // JSON-LD Product Schema для расширенных сниппетов в Google
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: wheel.name,
+    brand: {
+      '@type': 'Brand',
+      name: wheel.brand,
+    },
+    description: wheel.description || `Диск ${wheel.name} от ${wheel.brand}`,
+    image: wheel.images?.[0] || undefined,
+    sku: wheel.sku || wheel.id,
+    offers: {
+      '@type': 'Offer',
+      price: wheel.price,
+      priceCurrency: 'BYN',
+      availability: wheel.in_stock 
+        ? 'https://schema.org/InStock' 
+        : 'https://schema.org/OutOfStock',
+      seller: {
+        '@type': 'Organization',
+        name: 'RIMZONE',
+      },
+    },
+  }
+
   return (
     <main className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <Header />
       <div className="pt-20">
         <ProductDetails wheel={wheel as Wheel} />
