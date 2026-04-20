@@ -207,7 +207,7 @@ export function SupportWidget() {
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
-                  Режим работы: Пн-Сб 9:00 - 19:00
+                  Режим работы: Вт-Вс 9:00 - 17:00, Пн — выходной
                 </p>
               </div>
             )}

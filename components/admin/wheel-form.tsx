@@ -43,7 +43,9 @@ interface WheelFormProps {
 export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadingTransparent, setUploadingTransparent] = useState(false)
   const [images, setImages] = useState<string[]>(wheel?.images || [])
+  const [imageTransparent, setImageTransparent] = useState<string | null>(wheel?.image_transparent || null)
   const [carCompatibility, setCarCompatibility] = useState<CarCompatibility[]>(
     wheel?.car_compatibility || []
   )
@@ -51,6 +53,7 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
     wheel?.car_compatibility?.length === 0 || !wheel?.car_compatibility
   )
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const transparentFileInputRef = useRef<HTMLInputElement>(null)
 
   const [formData, setFormData] = useState({
     name: wheel?.name || '',
@@ -121,6 +124,43 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
     setImages((prev) => prev.filter((_, i) => i !== index))
   }
 
+  // Загрузка прозрачного изображения для AR
+  const handleTransparentImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingTransparent(true)
+
+    const formDataUpload = new FormData()
+    formDataUpload.append('file', file)
+
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formDataUpload,
+      })
+      const data = await res.json()
+      
+      if (!res.ok) {
+        alert(`Ошибка загрузки: ${data.error || 'Неизвестная ошибка'}`)
+      } else if (data.url) {
+        setImageTransparent(data.url)
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert('Ошибка при загрузке изображения')
+    }
+
+    setUploadingTransparent(false)
+    if (transparentFileInputRef.current) {
+      transparentFileInputRef.current.value = ''
+    }
+  }
+
+  const removeTransparentImage = () => {
+    setImageTransparent(null)
+  }
+
   // Функции для совместимости с авто
   const addCarCompatibility = () => {
     setCarCompatibility((prev) => [
@@ -179,6 +219,7 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
       weight: formData.weight ? parseFloat(formData.weight) : null,
       country: formData.country || null,
       images,
+      image_transparent: imageTransparent,
       car_compatibility: isUniversal ? [] : carCompatibility.filter(c => c.car_brand && (c.all_models || c.car_model)),
       is_universal: isUniversal,
     }
@@ -244,6 +285,52 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
               className="hidden"
             />
           </label>
+        </div>
+      </div>
+
+      {/* Изображение для AR-примерки */}
+      <div className="space-y-2">
+        <Label>Изображение для AR-примерки (без фона)</Label>
+        <p className="text-xs text-muted-foreground">
+          PNG с прозрачным фоном. Используется только в функции примерки дисков на автомобиль.
+        </p>
+        <div className="flex items-center gap-3">
+          {imageTransparent ? (
+            <div className="relative group">
+              <div className="w-20 h-20 border rounded bg-[url('/checkerboard.png')] bg-repeat bg-[length:10px_10px]">
+                <img
+                  src={imageTransparent}
+                  alt="AR изображение"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={removeTransparentImage}
+                className="absolute -top-2 -right-2 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ) : (
+            <label className="w-20 h-20 border-2 border-dashed border-border rounded flex flex-col items-center justify-center cursor-pointer hover:border-foreground transition-colors">
+              {uploadingTransparent ? (
+                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+              ) : (
+                <>
+                  <Upload className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-[10px] text-muted-foreground mt-1">PNG</span>
+                </>
+              )}
+              <input
+                ref={transparentFileInputRef}
+                type="file"
+                accept="image/png"
+                onChange={handleTransparentImageUpload}
+                className="hidden"
+              />
+            </label>
+          )}
         </div>
       </div>
 

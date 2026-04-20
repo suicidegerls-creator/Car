@@ -127,9 +127,16 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
     setIsDragging(false)
   }, [])
 
+  // Получаем изображение диска для AR (прозрачное если есть, иначе обычное)
+  const getWheelImageForAR = useCallback(() => {
+    if (!wheel) return null
+    return wheel.image_transparent || wheel.images?.[0] || null
+  }, [wheel])
+
   // Save composite image
   const saveImage = useCallback(() => {
-    if (!carPhoto || !wheel?.images?.[0] || !canvasRef.current) return
+    const wheelImageUrl = getWheelImageForAR()
+    if (!carPhoto || !wheelImageUrl || !canvasRef.current) return
     
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
@@ -161,14 +168,14 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
         
         // Download
         const link = document.createElement('a')
-        link.download = `${wheel.name}-fitting.jpg`
+        link.download = `${wheel?.name}-fitting.jpg`
         link.href = canvas.toDataURL('image/jpeg', 0.9)
         link.click()
       }
-      wheelImg.src = wheel.images[0]
+      wheelImg.src = wheelImageUrl
     }
     carImg.src = carPhoto
-  }, [carPhoto, wheel, wheelPosition, wheelSize, wheelRotation])
+  }, [carPhoto, wheel, wheelPosition, wheelSize, wheelRotation, getWheelImageForAR])
 
   // Reset
   const resetPhoto = useCallback(() => {
@@ -305,7 +312,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
               />
               
               {/* Wheel overlay */}
-              {wheel.images && wheel.images.length > 0 && (
+              {getWheelImageForAR() && (
                 <div
                   className="absolute pointer-events-none"
                   style={{
@@ -317,7 +324,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
                   }}
                 >
                   <Image
-                    src={wheel.images[0]}
+                    src={getWheelImageForAR()!}
                     alt={wheel.name}
                     fill
                     className="object-contain drop-shadow-2xl"

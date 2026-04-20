@@ -57,6 +57,7 @@ export interface Wheel {
   weight: number | null
   country: string | null
   images: string[]
+  image_transparent: string | null // PNG без фона для AR-примерки
   slug: string | null
   meta_title: string | null
   meta_description: string | null
