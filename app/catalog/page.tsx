@@ -4,7 +4,7 @@ import { CatalogContent } from '@/components/catalog/catalog-content'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Каталог дисков | RIMZONE',
+  title: 'Каталог дисков | DiskLand',
   description: 'Широкий выбор литых, кованых и штампованных дисков для любых автомобилей. Фильтрация по размеру, PCD, вылету и другим параметрам.',
 }
 

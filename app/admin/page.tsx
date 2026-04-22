@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Shield, Lock, Loader2 } from 'lucide-react'
 
-const ADMIN_TOKEN = 'rimzone-admin-2024'
+const ADMIN_TOKEN = 'diskland-admin-2024'
 
 function AdminContent() {
   const searchParams = useSearchParams()
@@ -47,7 +47,7 @@ function AdminContent() {
             <div className="mx-auto w-12 h-12 bg-secondary rounded-full flex items-center justify-center mb-4">
               <Shield className="w-6 h-6 text-foreground" />
             </div>
-            <CardTitle>Админ-панель RIMZONE</CardTitle>
+            <CardTitle>Админ-панель DiskLand</CardTitle>
             <CardDescription>
               Введите токен доступа или перейдите по секретной ссылке
             </CardDescription>

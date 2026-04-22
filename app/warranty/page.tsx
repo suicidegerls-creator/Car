@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Гарантия и возврат | RIMZONE - Премиальные литые диски',
+  title: 'Гарантия и возврат | DiskLand - Премиальные литые диски',
   description: 'Гарантия на литые диски от 1 года. 100% оригинальная продукция с сертификатами качества. Условия возврата и обмена. Защита ваших покупок.',
   openGraph: {
-    title: 'Гарантия и возврат | RIMZONE',
-    description: 'Гарантийные условия и политика возврата литых дисков в магазине RIMZONE.',
+    title: 'Гарантия и возврат | DiskLand',
+    description: 'Гарантийные условия и политика возврата литых дисков в магазине DiskLand.',
     type: 'website',
   },
 }

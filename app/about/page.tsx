@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'О компании | RIMZONE - Премиальные литые диски',
-  description: 'RIMZONE - ваш надежный партнер в мире премиальных литых дисков. Оригинальная продукция от ведущих мировых производителей. Профессиональные консультации и гарантия качества.',
+  title: 'О компании | DiskLand - Премиальные литые диски',
+  description: 'DiskLand - ваш надежный партнер в мире премиальных литых дисков. Оригинальная продукция от ведущих мировых производителей. Профессиональные консультации и гарантия качества.',
   openGraph: {
-    title: 'О компании RIMZONE',
+    title: 'О компании DiskLand',
     description: 'Премиальные литые диски от ведущих мировых производителей в Минске.',
     type: 'website',
   },
@@ -64,7 +64,7 @@ export default function AboutPage() {
               На главную
             </Link>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-              О компании RIMZONE
+              О компании DiskLand
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
               Мы специализируемся на продаже премиальных литых дисков от ведущих мировых 
@@ -196,7 +196,7 @@ export default function AboutPage() {
                 инвестиция в безопасность и стиль вашего автомобиля.&rdquo;
               </blockquote>
               <div className="text-muted-foreground">
-                — Команда RIMZONE
+                — Команда DiskLand
               </div>
             </div>
           </div>
@@ -237,7 +237,7 @@ export default function AboutPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Organization",
-            "name": "RIMZONE",
+            "name": "DiskLand",
             "description": "Магазин премиальных литых дисков в Минске",
             "url": "https://car-two-beta-48.vercel.app",
             "logo": "https://car-two-beta-48.vercel.app/logo.png",

@@ -21,11 +21,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .single()
 
   if (!wheel) {
-    return { title: 'Товар не найден | RIMZONE' }
+    return { title: 'Товар не найден | DiskLand' }
   }
 
-  const title = wheel.meta_title || `${wheel.name} | ${wheel.brand} | RIMZONE`
-  const description = wheel.meta_description || `Купить ${wheel.name} от ${wheel.brand} в магазине RIMZONE. Цена: ${wheel.price} BYN`
+  const title = wheel.meta_title || `${wheel.name} | ${wheel.brand} | DiskLand`
+  const description = wheel.meta_description || `Купить ${wheel.name} от ${wheel.brand} в магазине DiskLand. Цена: ${wheel.price} BYN`
   const image = wheel.images?.[0] || null
 
   return {
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: 'website',
       locale: 'ru_BY',
-      siteName: 'RIMZONE',
+      siteName: 'DiskLand',
       ...(image && { images: [{ url: image, width: 800, height: 800, alt: wheel.name }] }),
     },
     twitter: {
@@ -83,7 +83,7 @@ export default async function ProductPage({ params }: Props) {
         : 'https://schema.org/OutOfStock',
       seller: {
         '@type': 'Organization',
-        name: 'RIMZONE',
+        name: 'DiskLand',
       },
     },
   }

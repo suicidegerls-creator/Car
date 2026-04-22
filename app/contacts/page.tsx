@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Контакты | RIMZONE - Премиальные литые диски в Минске',
-  description: 'Свяжитесь с нами: +375 (29) 657-69-60. Магазин RIMZONE в АвтоМолле, павильон 276. Работаем Вт-Вс с 9:00 до 17:00. Консультации по подбору дисков.',
+  title: 'Контакты | DiskLand - Премиальные литые диски в Минске',
+  description: 'Свяжитесь с нами: +375 (29) 657-69-60. Магазин DiskLand в АвтоМолле, павильон 276. Работаем Вт-Вс с 9:00 до 17:00. Консультации по подбору дисков.',
   openGraph: {
-    title: 'Контакты | RIMZONE',
+    title: 'Контакты | DiskLand',
     description: 'Магазин премиальных литых дисков в Минске. АвтоМолл, павильон 276.',
     type: 'website',
   },
@@ -170,7 +170,7 @@ export default function ContactsPage() {
                     frameBorder="0"
                     allowFullScreen
                     className="w-full"
-                    title="Карта расположения магазина RIMZONE"
+                    title="Карта расположения магазина DiskLand"
                   />
                 </div>
                 <div className="mt-4 p-4 rounded-xl bg-card border border-border">
@@ -230,7 +230,7 @@ export default function ContactsPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
-            "name": "RIMZONE",
+            "name": "DiskLand",
             "description": "Магазин премиальных литых дисков в Минске",
             "image": "https://car-two-beta-48.vercel.app/logo.png",
             "telephone": "+375296576960",

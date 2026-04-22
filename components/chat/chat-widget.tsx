@@ -147,7 +147,7 @@ export function ChatWidget() {
                 <Bot className="w-4 h-4 text-accent-foreground" />
               </div>
               <div>
-                <CardTitle className="text-sm">RIMZONE Консультант</CardTitle>
+                <CardTitle className="text-sm">DiskLand Консультант</CardTitle>
                 <p className="text-xs text-muted-foreground">Онлайн</p>
               </div>
             </div>
@@ -162,7 +162,7 @@ export function ChatWidget() {
                 <div className="space-y-4">
                   <div className="bg-secondary/50 rounded-lg p-3">
                     <p className="text-sm">
-                      Здравствуйте! Я AI-консультант RIMZONE. Помогу подобрать диски, 
+                      Здравствуйте! Я AI-консультант DiskLand. Помогу подобрать диски, 
                       отвечу на вопросы о заказе или доставке.
                     </p>
                   </div>

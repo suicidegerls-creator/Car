@@ -12,24 +12,24 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 export const metadata: Metadata = {
   metadataBase: new URL('https://car-two-beta-48.vercel.app'),
   title: {
-    default: 'RIMZONE — Премиальные литые диски в Минске',
-    template: '%s | RIMZONE',
+    default: 'DiskLand — Премиальные литые диски в Минске',
+    template: '%s | DiskLand',
   },
   description: 'Магазин премиальных литых дисков в Минске. Оригинальная продукция BBS, OZ Racing, Enkei, Vossen. Доставка по Беларуси. +375 (29) 657-69-60',
   keywords: ['литые диски', 'диски Минск', 'автомобильные диски', 'BBS', 'OZ Racing', 'купить диски Беларусь', 'кованые диски'],
-  authors: [{ name: 'RIMZONE' }],
+  authors: [{ name: 'DiskLand' }],
   generator: 'v0.app',
   openGraph: {
     type: 'website',
     locale: 'ru_BY',
     url: 'https://car-two-beta-48.vercel.app',
-    siteName: 'RIMZONE',
-    title: 'RIMZONE — Премиальные литые диски в Минске',
+    siteName: 'DiskLand',
+    title: 'DiskLand — Премиальные литые диски в Минске',
     description: 'Магазин премиальных литых дисков в Минске. Оригинальная продукция от ведущих мировых производителей.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'RIMZONE — Премиальные литые диски',
+    title: 'DiskLand — Премиальные литые диски',
     description: 'Магазин премиальных литых дисков в Минске',
   },
   robots: {

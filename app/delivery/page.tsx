@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Доставка и оплата | RIMZONE - Премиальные литые диски',
+  title: 'Доставка и оплата | DiskLand - Премиальные литые диски',
   description: 'Бесплатный самовывоз из АвтоМолла. Доставка по Минску и всей Беларуси. Оплата наличными, картой или безналичный расчет. Рассрочка до 12 месяцев.',
   openGraph: {
-    title: 'Доставка и оплата | RIMZONE',
-    description: 'Условия доставки и способы оплаты литых дисков в магазине RIMZONE.',
+    title: 'Доставка и оплата | DiskLand',
+    description: 'Условия доставки и способы оплаты литых дисков в магазине DiskLand.',
     type: 'website',
   },
 }
@@ -265,7 +265,7 @@ export default function DeliveryPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": "Доставка и оплата | RIMZONE",
+            "name": "Доставка и оплата | DiskLand",
             "description": "Условия доставки и способы оплаты литых дисков",
             "mainEntity": {
               "@type": "FAQPage",

@@ -32,10 +32,10 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-full bg-foreground flex items-center justify-center">
-                <span className="text-background font-bold text-lg">R</span>
+                <span className="text-background font-bold text-lg">D</span>
               </div>
               <span className="font-bold text-xl tracking-tight text-foreground">
-                RIMZONE
+                DiskLand
               </span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-sm mb-6">
@@ -108,7 +108,7 @@ export function Footer() {
         {/* Bottom */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-muted-foreground text-sm">
-            © 2026 RIMZONE. Все права защищены.
+            © 2026 DiskLand. Все права защищены.
           </p>
           <div className="flex items-center gap-6 text-muted-foreground text-sm">
             <Link href="#" className="hover:text-foreground transition-colors">

@@ -218,7 +218,7 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
         await navigator.share({
           files: [file],
           title: 'AR-примерка диска',
-          text: `Примерка диска ${wheel?.name} от RIMZONE`
+          text: `Примерка диска ${wheel?.name} от DiskLand`
         })
       } else {
         // Fallback - copy to clipboard or show message

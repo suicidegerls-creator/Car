@@ -61,7 +61,7 @@ export const useCart = create<CartStore>()(
       },
     }),
     {
-      name: 'rimzone-cart',
+      name: 'diskland-cart',
     }
   )
 )

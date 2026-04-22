@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Админ-панель | RIMZONE',
+  title: 'Админ-панель | DiskLand',
   description: 'Управление каталогом дисков',
   robots: 'noindex, nofollow'
 }

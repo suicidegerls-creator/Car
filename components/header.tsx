@@ -41,10 +41,10 @@ export function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-full bg-foreground flex items-center justify-center">
-              <span className="text-background font-bold text-lg">R</span>
+              <span className="text-background font-bold text-lg">D</span>
             </div>
             <span className="font-bold text-xl tracking-tight text-foreground">
-              RIMZONE
+              DiskLand
             </span>
           </Link>
 

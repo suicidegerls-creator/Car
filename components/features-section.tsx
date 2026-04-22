@@ -34,7 +34,7 @@ export function FeaturesSection() {
             Почему мы
           </p>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground text-balance">
-            Преимущества RIMZONE
+            Преимущества DiskLand
           </h2>
         </div>
 
