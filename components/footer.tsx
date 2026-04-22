@@ -18,6 +18,7 @@ const footerLinks = {
   ],
   contacts: [
     { name: "+375 (29) 657-69-60", href: "tel:+375296576960" },
+    { name: "+375 (29) 688-91-88", href: "tel:+375296889188" },
     { name: "АвтоМолл, павильон 276", href: "/contacts" },
     { name: "Вт-Вс: 9:00 - 17:00", href: "/contacts" },
   ],

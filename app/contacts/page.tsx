@@ -51,14 +51,22 @@ export default function ContactsPage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                    Телефон
+                    Телефоны
                   </h3>
-                  <a 
-                    href="tel:+375296576960" 
-                    className="text-2xl md:text-3xl font-bold text-foreground hover:text-primary transition-colors"
-                  >
-                    +375 (29) 657-69-60
-                  </a>
+                  <div className="space-y-2">
+                    <a 
+                      href="tel:+375296576960" 
+                      className="block text-2xl md:text-3xl font-bold text-foreground hover:text-primary transition-colors"
+                    >
+                      +375 (29) 657-69-60
+                    </a>
+                    <a 
+                      href="tel:+375296889188" 
+                      className="block text-2xl md:text-3xl font-bold text-foreground hover:text-primary transition-colors"
+                    >
+                      +375 (29) 688-91-88
+                    </a>
+                  </div>
                   <p className="text-muted-foreground mt-2">
                     Звоните для консультации и оформления заказа
                   </p>
