@@ -23,11 +23,22 @@ import {
   BRAND_OPTIONS,
   CENTER_BORE_OPTIONS,
   ET_OPTIONS,
-  CAR_BRANDS,
   CAR_YEARS,
-  CAR_MODELS,
   CAR_MODIFICATIONS,
 } from '@/lib/types/wheel'
+
+interface CarBrand {
+  id: string
+  name: string
+  name_ru: string | null
+  is_popular: boolean
+}
+
+interface CarModel {
+  id: string
+  name: string
+  brand_id: string
+}
 
 interface CatalogFiltersProps {
   searchParams: ReadonlyURLSearchParams
@@ -41,6 +52,41 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
 
   // Show more params
   const [showMoreParams, setShowMoreParams] = useState(false)
+
+  // Dynamic car data from database
+  const [carBrands, setCarBrands] = useState<CarBrand[]>([])
+  const [carModels, setCarModels] = useState<CarModel[]>([])
+  const [loadingBrands, setLoadingBrands] = useState(true)
+  const [loadingModels, setLoadingModels] = useState(false)
+
+  // Load car brands on mount
+  useEffect(() => {
+    fetch('/api/car-brands')
+      .then(res => res.json())
+      .then(data => {
+        setCarBrands(data)
+        setLoadingBrands(false)
+      })
+      .catch(() => setLoadingBrands(false))
+  }, [])
+
+  // Load car models when brand changes
+  const selectedCarBrand = searchParams.get('car_brand') || 'none'
+  
+  useEffect(() => {
+    if (selectedCarBrand && selectedCarBrand !== 'none') {
+      setLoadingModels(true)
+      fetch(`/api/car-models?brandName=${encodeURIComponent(selectedCarBrand)}`)
+        .then(res => res.json())
+        .then(data => {
+          setCarModels(data)
+          setLoadingModels(false)
+        })
+        .catch(() => setLoadingModels(false))
+    } else {
+      setCarModels([])
+    }
+  }, [selectedCarBrand])
 
   // Sync price inputs with URL
   useEffect(() => {
@@ -65,7 +111,6 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
   }, [minPrice, maxPrice])
 
   // Get current car filter values from URL
-  const selectedCarBrand = searchParams.get('car_brand') || 'none'
   const selectedCarModel = searchParams.get('car_model') || 'none'
   const selectedCarYear = searchParams.get('car_year') || 'none'
   const selectedCarModification = searchParams.get('car_modification') || 'none'
@@ -111,7 +156,7 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
 
   const getParam = (key: string) => searchParams.get(key) || ''
 
-  const availableModels = selectedCarBrand !== 'none' ? (CAR_MODELS[selectedCarBrand] || []) : []
+  
 
   // Manual search button - applies all current URL params (useful if user wants to confirm)
   const handleCarSearch = () => {
@@ -144,14 +189,14 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3 sm:gap-4">
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Марка</Label>
-              <Select value={selectedCarBrand} onValueChange={handleCarBrandChange}>
+              <Select value={selectedCarBrand} onValueChange={handleCarBrandChange} disabled={loadingBrands}>
                 <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Выберите" />
+                  <SelectValue placeholder={loadingBrands ? "Загрузка..." : "Выберите"} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Любая марка</SelectItem>
-                  {CAR_BRANDS.filter(b => b && b.length > 0).map((brand) => (
-                    <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                  {carBrands.map((brand) => (
+                    <SelectItem key={brand.id} value={brand.name}>{brand.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -162,15 +207,15 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
               <Select
                 value={selectedCarModel}
                 onValueChange={handleCarModelChange}
-                disabled={selectedCarBrand === 'none'}
+                disabled={selectedCarBrand === 'none' || loadingModels}
               >
                 <SelectTrigger className="h-10">
-                  <SelectValue placeholder={selectedCarBrand !== 'none' ? 'Выберите' : 'Сначала марку'} />
+                  <SelectValue placeholder={loadingModels ? 'Загрузка...' : selectedCarBrand !== 'none' ? 'Выберите' : 'Сначала марку'} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Любая модель</SelectItem>
-                  {availableModels.filter(m => m && m.length > 0).map((model) => (
-                    <SelectItem key={model} value={model}>{model}</SelectItem>
+                  {carModels.map((model) => (
+                    <SelectItem key={model.id} value={model.name}>{model.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

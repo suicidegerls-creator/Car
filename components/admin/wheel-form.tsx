@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,10 +30,21 @@ import {
   FINISH_OPTIONS,
   MATERIAL_OPTIONS,
   COUNTRY_OPTIONS,
-  CAR_BRANDS,
   CAR_YEARS,
-  CAR_MODELS,
 } from '@/lib/types/wheel'
+
+interface CarBrand {
+  id: string
+  name: string
+  name_ru: string | null
+  is_popular: boolean
+}
+
+interface CarModel {
+  id: string
+  name: string
+  brand_id: string
+}
 
 interface WheelFormProps {
   wheel?: Wheel
@@ -54,6 +65,18 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
   )
   const fileInputRef = useRef<HTMLInputElement>(null)
   const transparentFileInputRef = useRef<HTMLInputElement>(null)
+
+  // Dynamic car data from database
+  const [carBrands, setCarBrands] = useState<CarBrand[]>([])
+  const [carModelsCache, setCarModelsCache] = useState<Record<string, CarModel[]>>({})
+
+  // Load car brands on mount
+  useEffect(() => {
+    fetch('/api/car-brands')
+      .then(res => res.json())
+      .then(data => setCarBrands(data))
+      .catch(console.error)
+  }, [])
 
   const [formData, setFormData] = useState({
     name: wheel?.name || '',
@@ -188,8 +211,21 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
     setCarCompatibility((prev) => prev.filter((_, i) => i !== index))
   }
 
-  const getModelsForBrand = (brand: string) => {
-    return CAR_MODELS[brand] || []
+  const getModelsForBrand = (brand: string): CarModel[] => {
+    // Return cached models if available
+    if (carModelsCache[brand]) {
+      return carModelsCache[brand]
+    }
+    
+    // Fetch models for this brand
+    fetch(`/api/car-models?brandName=${encodeURIComponent(brand)}`)
+      .then(res => res.json())
+      .then(data => {
+        setCarModelsCache(prev => ({ ...prev, [brand]: data }))
+      })
+      .catch(console.error)
+    
+    return []
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -687,8 +723,8 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="none">Выберите марку</SelectItem>
-                            {CAR_BRANDS.map((brand) => (
-                              <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                            {carBrands.map((brand) => (
+                              <SelectItem key={brand.id} value={brand.name}>{brand.name}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -729,7 +765,7 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
                           <SelectContent>
                             <SelectItem value="none">Выберите модель</SelectItem>
                             {getModelsForBrand(car.car_brand).map((model) => (
-                              <SelectItem key={model} value={model}>{model}</SelectItem>
+                              <SelectItem key={model.id} value={model.name}>{model.name}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>

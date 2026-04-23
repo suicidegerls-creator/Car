@@ -16,9 +16,7 @@ export {
   FINISH_OPTIONS,
   MATERIAL_OPTIONS,
   COUNTRY_OPTIONS,
-  CAR_BRANDS,
   CAR_YEARS,
-  CAR_MODELS,
   CAR_MODIFICATIONS,
 } from '@/lib/constants/wheel-options'
 
