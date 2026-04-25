@@ -45,13 +45,24 @@ export function DiscountWheel({ onSpinStart, onSpinComplete, disabled, className
     // Находим индекс сегмента для выигранной скидки
     const selectedIndex = SEGMENTS.findIndex(s => s.value === discount)
     
-    const segmentAngle = 360 / SEGMENTS.length
-    // Центр сегмента (указатель сверху, так что 0 градусов = сегмент сверху)
-    const targetSegmentCenter = selectedIndex * segmentAngle + segmentAngle / 2
-    // Спин 5-8 полных оборотов + остановка на нужном сегменте
-    const fullRotations = (5 + Math.random() * 3) * 360
-    // Стрелка сверху (0 градусов), так что нужно повернуть колесо так, чтобы сегмент оказался сверху
-    const finalRotation = rotation + fullRotations + (360 - targetSegmentCenter)
+    const segmentAngle = 360 / SEGMENTS.length // 60 градусов на сегмент
+    
+    // Текущая позиция колеса (нормализованная к 0-360)
+    const currentRotation = rotation % 360
+    
+    // Центр нужного сегмента (сегмент 0 уже сверху при rotation=0)
+    // Сегмент с индексом N находится на угле N * 60 градусов от верха
+    const targetAngle = selectedIndex * segmentAngle + segmentAngle / 2
+    
+    // Сколько нужно довернуть от текущей позиции чтобы попасть на нужный сегмент
+    // Указатель сверху, колесо крутится по часовой стрелке
+    // Чтобы сегмент оказался сверху, нужно повернуть на (360 - targetAngle)
+    let angleToTarget = (360 - targetAngle) - currentRotation
+    if (angleToTarget < 0) angleToTarget += 360
+    
+    // Спин 5-8 полных оборотов + довернуть до нужного сегмента
+    const fullRotations = (5 + Math.floor(Math.random() * 3)) * 360
+    const finalRotation = rotation + fullRotations + angleToTarget
 
     setRotation(finalRotation)
 

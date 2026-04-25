@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -7,35 +7,38 @@ export async function GET(request: Request) {
   const brandName = searchParams.get('brandName')
 
   try {
-    let whereClause = {}
+    const supabase = await createClient()
+    
+    let query = supabase
+      .from('car_models')
+      .select('id, name, brand_id')
+      .order('name', { ascending: true })
 
     if (brandId) {
-      whereClause = { brand_id: brandId }
+      query = query.eq('brand_id', brandId)
     } else if (brandName) {
       // Find brand by name first
-      const brand = await prisma.carBrand.findUnique({
-        where: { name: brandName },
-        select: { id: true },
-      })
+      const { data: brand } = await supabase
+        .from('car_brands')
+        .select('id')
+        .eq('name', brandName)
+        .single()
 
       if (!brand) {
         return NextResponse.json([])
       }
 
-      whereClause = { brand_id: brand.id }
+      query = query.eq('brand_id', brand.id)
     }
 
-    const models = await prisma.carModel.findMany({
-      where: whereClause,
-      select: {
-        id: true,
-        name: true,
-        brand_id: true,
-      },
-      orderBy: { name: 'asc' },
-    })
+    const { data: models, error } = await query
 
-    return NextResponse.json(models)
+    if (error) {
+      console.error('Error fetching car models:', error)
+      return NextResponse.json({ error: 'Failed to fetch car models' }, { status: 500 })
+    }
+
+    return NextResponse.json(models || [])
   } catch (error) {
     console.error('Error fetching car models:', error)
     return NextResponse.json({ error: 'Failed to fetch car models' }, { status: 500 })
