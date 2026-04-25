@@ -38,28 +38,35 @@ export function HeroSection() {
   const textParallax = scrollY * 0.1
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen flex flex-col overflow-x-clip overflow-y-visible">
+    <section ref={sectionRef} className="relative min-h-screen flex flex-col">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-secondary via-background to-background" />
 
-      {/* 3D Wheel - центральный фон с параллаксом */}
+      {/* 3D Wheel - полноэкранный фон без обрезки */}
       <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+        className="absolute inset-0 flex items-center justify-center pointer-events-none"
         style={{ 
-          transform: `translate(-50%, calc(-50% + ${wheelParallax}px))`,
+          transform: `translateY(${wheelParallax}px)`,
           willChange: 'transform'
         }}
       >
-        <div className="w-[70vw] h-[70vw] sm:w-[60vw] sm:h-[60vw] md:w-[55vw] md:h-[55vw] lg:w-[50vw] lg:h-[50vw] max-w-[700px] max-h-[700px] opacity-25 sm:opacity-35 lg:opacity-45">
+        {/* Контейнер колеса с фиксированным размером относительно меньшей стороны экрана */}
+        <div 
+          className="opacity-20 sm:opacity-30 lg:opacity-40"
+          style={{
+            width: 'min(90vh, 90vw)',
+            height: 'min(90vh, 90vw)',
+          }}
+        >
           <Wheel3D />
         </div>
       </div>
 
       {/* Затемнение для читаемости текста */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-transparent to-background/80" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-background/70" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-background/70" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/50 via-transparent to-background/50" />
 
-      {/* Основной контент с параллаксом - компактный центрированный блок */}
+      {/* Основной контент с параллаксом */}
       <div 
         className="relative flex-1 flex flex-col items-center justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32"
         style={{ 
@@ -73,11 +80,11 @@ export function HeroSection() {
             Премиальные диски
           </p>
           
-          {/* Главный заголовок - единый блок */}
+          {/* Главный заголовок */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold leading-tight mb-2 sm:mb-3">
             <span className="text-foreground">Совершенство</span>
             <br />
-            <span className="text-muted-foreground">в деталях</span>
+            <span className="text-primary">в деталях</span>
           </h1>
           
           {/* Описание */}
@@ -87,7 +94,7 @@ export function HeroSection() {
 
           {/* Кнопка */}
           <div className="flex justify-center mb-10 sm:mb-14">
-            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-8">
+            <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 shadow-lg">
               <Link href="/catalog">
                 Каталог дисков
                 <ArrowRight className="ml-2 w-4 h-4" />
@@ -113,7 +120,7 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Scroll indicator - с отступом чтобы не налазил на контент */}
+      {/* Scroll indicator */}
       <div className="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground/70 animate-bounce">
         <span className="text-[10px] sm:text-xs tracking-widest uppercase">Прокрутите</span>
         <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
