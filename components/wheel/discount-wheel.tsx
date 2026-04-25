@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import confetti from "canvas-confetti"
 
 interface DiscountWheelProps {
+  onSpinStart: () => Promise<number | null> // Возвращает скидку от API
   onSpinComplete: (discount: number) => void
   disabled?: boolean
   className?: string
@@ -20,46 +20,47 @@ const SEGMENTS = [
   { value: 5, label: "5%", color: "hsl(5, 90%, 45%)" },
 ]
 
-export function DiscountWheel({ onSpinComplete, disabled, className }: DiscountWheelProps) {
+export function DiscountWheel({ onSpinStart, onSpinComplete, disabled, className }: DiscountWheelProps) {
   const [isSpinning, setIsSpinning] = useState(false)
   const [rotation, setRotation] = useState(0)
-  const [result, setResult] = useState<number | null>(null)
+  const [mounted, setMounted] = useState(false)
 
-  const spinWheel = useCallback(() => {
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const spinWheel = async () => {
     if (isSpinning || disabled) return
 
     setIsSpinning(true)
-    setResult(null)
 
-    // Weighted random - lower discounts more likely
-    const weights = [30, 25, 20, 12, 8, 5] // 0%, 1%, 2%, 3%, 4%, 5%
-    const totalWeight = weights.reduce((a, b) => a + b, 0)
-    let random = Math.random() * totalWeight
-    let selectedIndex = 0
+    // Получаем результат от API ДО анимации
+    const discount = await onSpinStart()
     
-    for (let i = 0; i < weights.length; i++) {
-      random -= weights[i]
-      if (random <= 0) {
-        selectedIndex = i
-        break
-      }
+    if (discount === null) {
+      setIsSpinning(false)
+      return
     }
 
+    // Находим индекс сегмента для выигранной скидки
+    const selectedIndex = SEGMENTS.findIndex(s => s.value === discount)
+    
     const segmentAngle = 360 / SEGMENTS.length
+    // Центр сегмента (указатель сверху, так что 0 градусов = сегмент сверху)
     const targetSegmentCenter = selectedIndex * segmentAngle + segmentAngle / 2
-    // Spin 5-8 full rotations + land on segment
+    // Спин 5-8 полных оборотов + остановка на нужном сегменте
     const fullRotations = (5 + Math.random() * 3) * 360
+    // Стрелка сверху (0 градусов), так что нужно повернуть колесо так, чтобы сегмент оказался сверху
     const finalRotation = rotation + fullRotations + (360 - targetSegmentCenter)
 
     setRotation(finalRotation)
 
     setTimeout(() => {
       setIsSpinning(false)
-      setResult(SEGMENTS[selectedIndex].value)
-      onSpinComplete(SEGMENTS[selectedIndex].value)
+      onSpinComplete(discount)
       
-      // Confetti for discounts > 0
-      if (SEGMENTS[selectedIndex].value > 0) {
+      // Конфетти для скидок > 0
+      if (discount > 0) {
         confetti({
           particleCount: 100,
           spread: 70,
@@ -68,7 +69,15 @@ export function DiscountWheel({ onSpinComplete, disabled, className }: DiscountW
         })
       }
     }, 4000)
-  }, [isSpinning, disabled, rotation, onSpinComplete])
+  }
+
+  if (!mounted) {
+    return (
+      <div className={cn("flex flex-col items-center gap-6", className)}>
+        <div className="w-[320px] h-[320px] md:w-[380px] md:h-[380px] rounded-full bg-muted animate-pulse" />
+      </div>
+    )
+  }
 
   return (
     <div className={cn("flex flex-col items-center gap-6", className)}>
@@ -114,7 +123,7 @@ export function DiscountWheel({ onSpinComplete, disabled, className }: DiscountW
               
               const largeArc = endAngle - startAngle > 180 ? 1 : 0
               
-              const pathD = `M 50 50 L ${x1} ${y1} A 50 50 0 ${largeArc} 1 ${x2} ${y2} Z`
+              const pathD = `M 50 50 L ${x1.toFixed(2)} ${y1.toFixed(2)} A 50 50 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`
               
               // Text position
               const midAngle = ((startAngle + endAngle) / 2 * Math.PI) / 180
@@ -134,20 +143,20 @@ export function DiscountWheel({ onSpinComplete, disabled, className }: DiscountW
                   <line
                     x1="50"
                     y1="50"
-                    x2={x1}
-                    y2={y1}
+                    x2={x1.toFixed(2)}
+                    y2={y1.toFixed(2)}
                     stroke="rgba(0,0,0,0.2)"
                     strokeWidth="2"
                   />
                   <text
-                    x={textX}
-                    y={textY}
+                    x={textX.toFixed(2)}
+                    y={textY.toFixed(2)}
                     fill="white"
                     fontSize="8"
                     fontWeight="bold"
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    transform={`rotate(${textRotation}, ${textX}, ${textY})`}
+                    transform={`rotate(${textRotation.toFixed(2)}, ${textX.toFixed(2)}, ${textY.toFixed(2)})`}
                     style={{ textShadow: "1px 1px 2px rgba(0,0,0,0.5)" }}
                   >
                     {segment.label}
@@ -182,37 +191,22 @@ export function DiscountWheel({ onSpinComplete, disabled, className }: DiscountW
             </div>
           </div>
         </div>
+
+        {/* Spin button overlay */}
+        <button
+          onClick={spinWheel}
+          disabled={isSpinning || disabled}
+          className="absolute inset-0 flex items-center justify-center cursor-pointer disabled:cursor-not-allowed z-10"
+          aria-label="Крутить колесо"
+        >
+          <span className="sr-only">{isSpinning ? "Крутится..." : "Крутить колесо"}</span>
+        </button>
       </div>
 
-      {/* Spin Button */}
-      <Button
-        onClick={spinWheel}
-        disabled={isSpinning || disabled}
-        size="lg"
-        className="px-10 py-6 text-lg font-bold uppercase tracking-wider shadow-lg hover:scale-105 transition-transform"
-      >
-        {isSpinning ? "Крутится..." : "Крутить колесо"}
-      </Button>
-
-      {/* Result */}
-      {result !== null && !isSpinning && (
-        <div className={cn(
-          "text-center p-4 rounded-xl animate-in fade-in zoom-in duration-300",
-          result > 0 ? "bg-primary/10 border border-primary" : "bg-muted"
-        )}>
-          {result > 0 ? (
-            <>
-              <p className="text-2xl font-bold text-primary">Поздравляем!</p>
-              <p className="text-lg text-foreground">Вы выиграли скидку <span className="font-bold text-primary">{result}%</span></p>
-            </>
-          ) : (
-            <>
-              <p className="text-xl font-semibold text-muted-foreground">В этот раз не повезло</p>
-              <p className="text-sm text-muted-foreground">Попробуйте снова через неделю!</p>
-            </>
-          )}
-        </div>
-      )}
+      {/* Spin instruction */}
+      <p className="text-sm text-muted-foreground text-center">
+        {isSpinning ? "Колесо крутится..." : disabled ? "Нажмите, чтобы крутить" : "Нажмите на колесо, чтобы крутить"}
+      </p>
     </div>
   )
 }

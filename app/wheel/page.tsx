@@ -33,7 +33,7 @@ export default function WheelPage() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [status, setStatus] = useState<WheelStatus | null>(null)
-  const [spinning, setSpinning] = useState(false)
+  const [lastWonDiscount, setLastWonDiscount] = useState<number | null>(null)
 
   const fetchStatus = useCallback(async () => {
     try {
@@ -68,31 +68,43 @@ export default function WheelPage() {
     return () => subscription.unsubscribe()
   }, [fetchStatus])
 
+  // Вызывается при нажатии на колесо - запрашивает скидку у API
+  const handleSpinStart = async (): Promise<number | null> => {
+    if (!user || !status?.canSpin) {
+      toast.error("Вы не можете крутить колесо сейчас")
+      return null
+    }
+    
+    try {
+      const res = await fetch("/api/wheel", { method: "POST" })
+      
+      if (!res.ok) {
+        const data = await res.json()
+        toast.error(data.error || "Не удалось крутить колесо")
+        return null
+      }
+      
+      const data = await res.json()
+      return data.discount?.discount_percent ?? 0
+    } catch (error) {
+      toast.error("Ошибка при вращении колеса")
+      return null
+    }
+  }
+
+  // Вызывается после остановки колеса
   const handleSpinComplete = async (discount: number) => {
-    setSpinning(false)
+    setLastWonDiscount(discount)
     await fetchStatus()
     
     if (discount > 0) {
       toast.success(`Вы выиграли скидку ${discount}%!`, {
         description: "Активируйте её в течение 24 часов"
       })
-    }
-  }
-
-  const handleSpin = async () => {
-    if (!user || spinning || !status?.canSpin) return
-    
-    setSpinning(true)
-    try {
-      const res = await fetch("/api/wheel", { method: "POST" })
-      if (!res.ok) {
-        const data = await res.json()
-        toast.error(data.error || "Не удалось крутить колесо")
-        setSpinning(false)
-      }
-    } catch (error) {
-      toast.error("Ошибка при вращении колеса")
-      setSpinning(false)
+    } else {
+      toast.info("В этот раз не повезло", {
+        description: "Попробуйте снова через неделю"
+      })
     }
   }
 
@@ -110,6 +122,7 @@ export default function WheelPage() {
         toast.success("Скидка активирована!", {
           description: "Она будет применена к вашему следующему заказу"
         })
+        setLastWonDiscount(null)
         await fetchStatus()
       } else {
         toast.error("Не удалось активировать скидку")
@@ -141,7 +154,7 @@ export default function WheelPage() {
     <main className="min-h-screen bg-background">
       <Header />
       
-      <div className="container mx-auto px-4 py-8 md:py-12">
+      <div className="container mx-auto px-4 py-8 md:py-12 pt-24">
         {/* Hero */}
         <div className="text-center mb-10">
           <Badge variant="secondary" className="mb-4 px-4 py-1.5">
@@ -177,9 +190,31 @@ export default function WheelPage() {
             ) : (
               <>
                 <DiscountWheel
+                  onSpinStart={handleSpinStart}
                   onSpinComplete={handleSpinComplete}
-                  disabled={!status?.canSpin || spinning}
+                  disabled={!status?.canSpin}
                 />
+                
+                {/* Result message */}
+                {lastWonDiscount !== null && (
+                  <div className={`mt-6 text-center p-4 rounded-xl animate-in fade-in zoom-in duration-300 ${
+                    lastWonDiscount > 0 ? "bg-primary/10 border border-primary" : "bg-muted"
+                  }`}>
+                    {lastWonDiscount > 0 ? (
+                      <>
+                        <p className="text-2xl font-bold text-primary">Поздравляем!</p>
+                        <p className="text-lg text-foreground">
+                          Вы выиграли скидку <span className="font-bold text-primary">{lastWonDiscount}%</span>
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-xl font-semibold text-muted-foreground">В этот раз не повезло</p>
+                        <p className="text-sm text-muted-foreground">Попробуйте снова через неделю!</p>
+                      </>
+                    )}
+                  </div>
+                )}
                 
                 {!status?.canSpin && status?.nextSpinAt && (
                   <div className="mt-6 text-center p-4 bg-muted rounded-xl">
@@ -198,7 +233,7 @@ export default function WheelPage() {
 
           {/* Info Section */}
           <div className="space-y-6">
-            {/* Active/Pending Discount */}
+            {/* Pending Discount - needs activation */}
             {user && status?.pendingDiscount && status.pendingDiscount.discount_percent > 0 && (
               <Card className="border-primary bg-primary/5">
                 <CardHeader>
@@ -226,6 +261,7 @@ export default function WheelPage() {
               </Card>
             )}
 
+            {/* Active Discount */}
             {user && status?.activeDiscount && (
               <Card className="border-green-500 bg-green-500/5">
                 <CardHeader>

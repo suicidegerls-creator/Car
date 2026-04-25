@@ -21,18 +21,12 @@ export function WheelPromoBanner() {
               <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="4" className="text-primary" />
               <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="3" className="text-primary" />
               <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary" />
-              {[0, 60, 120, 180, 240, 300].map((angle) => (
-                <line
-                  key={angle}
-                  x1="50"
-                  y1="50"
-                  x2={50 + 45 * Math.cos((angle * Math.PI) / 180)}
-                  y2={50 + 45 * Math.sin((angle * Math.PI) / 180)}
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  className="text-primary"
-                />
-              ))}
+              <line x1="50" y1="50" x2="95" y2="50" stroke="currentColor" strokeWidth="3" className="text-primary" />
+              <line x1="50" y1="50" x2="72.5" y2="89" stroke="currentColor" strokeWidth="3" className="text-primary" />
+              <line x1="50" y1="50" x2="27.5" y2="89" stroke="currentColor" strokeWidth="3" className="text-primary" />
+              <line x1="50" y1="50" x2="5" y2="50" stroke="currentColor" strokeWidth="3" className="text-primary" />
+              <line x1="50" y1="50" x2="27.5" y2="11" stroke="currentColor" strokeWidth="3" className="text-primary" />
+              <line x1="50" y1="50" x2="72.5" y2="11" stroke="currentColor" strokeWidth="3" className="text-primary" />
             </svg>
           </div>
           
@@ -86,30 +80,12 @@ export function WheelPromoBanner() {
                 <div className="absolute inset-4 rounded-full bg-gradient-to-b from-zinc-300 via-zinc-100 to-zinc-400" />
                 <div className="absolute inset-6 rounded-full overflow-hidden">
                   <svg viewBox="0 0 100 100" className="w-full h-full">
-                    {[0, 1, 2, 3, 4, 5].map((i) => {
-                      const angle = i * 60 - 90
-                      const startRad = (angle * Math.PI) / 180
-                      const endRad = ((angle + 60) * Math.PI) / 180
-                      const x1 = 50 + 50 * Math.cos(startRad)
-                      const y1 = 50 + 50 * Math.sin(startRad)
-                      const x2 = 50 + 50 * Math.cos(endRad)
-                      const y2 = 50 + 50 * Math.sin(endRad)
-                      const colors = [
-                        "hsl(var(--muted))",
-                        "hsl(45, 80%, 65%)",
-                        "hsl(35, 75%, 55%)",
-                        "hsl(25, 80%, 50%)",
-                        "hsl(15, 85%, 50%)",
-                        "hsl(5, 90%, 45%)"
-                      ]
-                      return (
-                        <path
-                          key={i}
-                          d={`M 50 50 L ${x1} ${y1} A 50 50 0 0 1 ${x2} ${y2} Z`}
-                          fill={colors[i]}
-                        />
-                      )
-                    })}
+                    <path d="M 50 50 L 50 0 A 50 50 0 0 1 93.3 25 Z" fill="hsl(var(--muted))" />
+                    <path d="M 50 50 L 93.3 25 A 50 50 0 0 1 93.3 75 Z" fill="hsl(45, 80%, 65%)" />
+                    <path d="M 50 50 L 93.3 75 A 50 50 0 0 1 50 100 Z" fill="hsl(35, 75%, 55%)" />
+                    <path d="M 50 50 L 50 100 A 50 50 0 0 1 6.7 75 Z" fill="hsl(25, 80%, 50%)" />
+                    <path d="M 50 50 L 6.7 75 A 50 50 0 0 1 6.7 25 Z" fill="hsl(15, 85%, 50%)" />
+                    <path d="M 50 50 L 6.7 25 A 50 50 0 0 1 50 0 Z" fill="hsl(5, 90%, 45%)" />
                   </svg>
                 </div>
                 {/* Center hub */}

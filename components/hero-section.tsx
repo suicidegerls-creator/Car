@@ -38,19 +38,19 @@ export function HeroSection() {
   const textParallax = scrollY * 0.1
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen flex flex-col overflow-hidden">
+    <section ref={sectionRef} className="relative min-h-screen flex flex-col overflow-x-clip overflow-y-visible">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-secondary via-background to-background" />
 
       {/* 3D Wheel - центральный фон с параллаксом */}
       <div 
-        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
         style={{ 
-          transform: `translateY(${wheelParallax}px)`,
+          transform: `translate(-50%, calc(-50% + ${wheelParallax}px))`,
           willChange: 'transform'
         }}
       >
-        <div className="w-[120vw] h-[120vw] sm:w-[90vw] sm:h-[90vw] md:w-[80vw] md:h-[80vw] lg:w-[70vw] lg:h-[70vw] max-w-[900px] max-h-[900px] opacity-30 sm:opacity-40 lg:opacity-50">
+        <div className="w-[70vw] h-[70vw] sm:w-[60vw] sm:h-[60vw] md:w-[55vw] md:h-[55vw] lg:w-[50vw] lg:h-[50vw] max-w-[700px] max-h-[700px] opacity-25 sm:opacity-35 lg:opacity-45">
           <Wheel3D />
         </div>
       </div>
