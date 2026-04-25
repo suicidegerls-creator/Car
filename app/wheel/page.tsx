@@ -181,11 +181,18 @@ export default function WheelPage() {
                 <p className="text-muted-foreground mb-6">
                   Войдите или зарегистрируйтесь, чтобы крутить колесо удачи
                 </p>
-                <Link href="/auth">
-                  <Button size="lg" className="w-full">
-                    Войти / Регистрация
-                  </Button>
-                </Link>
+                <div className="flex flex-col gap-3">
+                  <Link href="/auth/login">
+                    <Button size="lg" className="w-full">
+                      Войти
+                    </Button>
+                  </Link>
+                  <Link href="/auth/sign-up">
+                    <Button size="lg" variant="outline" className="w-full">
+                      Регистрация
+                    </Button>
+                  </Link>
+                </div>
               </Card>
             ) : (
               <>

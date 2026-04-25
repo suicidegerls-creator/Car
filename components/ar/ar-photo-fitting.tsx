@@ -16,8 +16,11 @@ import {
   ShoppingCart,
   ImageIcon,
   X,
-  Move,
   ChevronDown,
+  Maximize2,
+  RotateCw,
+  FlipHorizontal,
+  FlipVertical,
 } from 'lucide-react'
 import type { Wheel } from '@/lib/types/wheel'
 
@@ -36,10 +39,14 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
   
   // Wheel overlay state
   const [wheelPosition, setWheelPosition] = useState({ x: 50, y: 60 }) // percentage
-  const [wheelSize, setWheelSize] = useState(25) // percentage of image width
-  const [wheelRotation, setWheelRotation] = useState(0)
+  const [wheelScaleX, setWheelScaleX] = useState(25) // ширина в процентах
+  const [wheelScaleY, setWheelScaleY] = useState(25) // высота в процентах
+  const [wheelRotateZ, setWheelRotateZ] = useState(0) // обычный поворот
+  const [wheelRotateX, setWheelRotateX] = useState(0) // наклон вперед/назад
+  const [wheelRotateY, setWheelRotateY] = useState(0) // перспектива влево/вправо
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+  const [activeTab, setActiveTab] = useState<'size' | 'rotate'>('size')
   
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -80,7 +87,8 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
         
         // Reset wheel position to center-bottom area (typical wheel location)
         setWheelPosition({ x: 30, y: 70 })
-        setWheelSize(20)
+        setWheelScaleX(20)
+        setWheelScaleY(20)
       }
       img.src = event.target?.result as string
     }
@@ -101,12 +109,12 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
     const dx = Math.abs(x - wheelPosition.x)
     const dy = Math.abs(y - wheelPosition.y)
     
-    if (dx < wheelSize / 2 + 5 && dy < wheelSize / 2 + 5) {
+    if (dx < wheelScaleX / 2 + 5 && dy < wheelScaleY / 2 + 5) {
       setIsDragging(true)
       setDragStart({ x: e.clientX, y: e.clientY })
       e.preventDefault()
     }
-  }, [carPhoto, wheelPosition, wheelSize])
+  }, [carPhoto, wheelPosition, wheelScaleX, wheelScaleY])
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDragging || !containerRef.current) return
@@ -155,14 +163,14 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
       const wheelImg = document.createElement('img')
       wheelImg.crossOrigin = 'anonymous'
       wheelImg.onload = () => {
-        const wheelW = (wheelSize / 100) * canvas.width
-        const wheelH = wheelW
+        const wheelW = (wheelScaleX / 100) * canvas.width
+        const wheelH = (wheelScaleY / 100) * canvas.height
         const wheelX = (wheelPosition.x / 100) * canvas.width - wheelW / 2
         const wheelY = (wheelPosition.y / 100) * canvas.height - wheelH / 2
         
         ctx.save()
         ctx.translate(wheelX + wheelW / 2, wheelY + wheelH / 2)
-        ctx.rotate((wheelRotation * Math.PI) / 180)
+        ctx.rotate((wheelRotateZ * Math.PI) / 180)
         ctx.drawImage(wheelImg, -wheelW / 2, -wheelH / 2, wheelW, wheelH)
         ctx.restore()
         
@@ -175,17 +183,30 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
       wheelImg.src = wheelImageUrl
     }
     carImg.src = carPhoto
-  }, [carPhoto, wheel, wheelPosition, wheelSize, wheelRotation, getWheelImageForAR])
+  }, [carPhoto, wheel, wheelPosition, wheelScaleX, wheelScaleY, wheelRotateZ, getWheelImageForAR])
 
   // Reset
   const resetPhoto = useCallback(() => {
     setCarPhoto(null)
     setWheelPosition({ x: 50, y: 60 })
-    setWheelSize(25)
-    setWheelRotation(0)
+    setWheelScaleX(25)
+    setWheelScaleY(25)
+    setWheelRotateZ(0)
+    setWheelRotateX(0)
+    setWheelRotateY(0)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
+  }, [])
+
+  // Reset wheel only
+  const resetWheel = useCallback(() => {
+    setWheelPosition({ x: 50, y: 60 })
+    setWheelScaleX(25)
+    setWheelScaleY(25)
+    setWheelRotateZ(0)
+    setWheelRotateX(0)
+    setWheelRotateY(0)
   }, [])
 
   // No wheel selected
@@ -311,32 +332,27 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
                 draggable={false}
               />
               
-              {/* Wheel overlay */}
+              {/* Wheel overlay with 3D transforms */}
               {getWheelImageForAR() && (
                 <div
-                  className="absolute pointer-events-none"
+                  className="absolute cursor-move"
                   style={{
                     left: `${wheelPosition.x}%`,
                     top: `${wheelPosition.y}%`,
-                    width: `${wheelSize}%`,
-                    transform: `translate(-50%, -50%) rotate(${wheelRotation}deg)`,
-                    aspectRatio: '1',
+                    width: `${wheelScaleX}%`,
+                    height: `${wheelScaleY}%`,
+                    transform: `translate(-50%, -50%) perspective(500px) rotateX(${wheelRotateX}deg) rotateY(${wheelRotateY}deg) rotateZ(${wheelRotateZ}deg)`,
+                    transformStyle: 'preserve-3d',
+                    transition: isDragging ? 'none' : 'transform 0.1s ease-out'
                   }}
                 >
                   <Image
                     src={getWheelImageForAR()!}
                     alt={wheel.name}
                     fill
-                    className="object-contain drop-shadow-2xl"
+                    className="object-contain drop-shadow-2xl pointer-events-none"
                     draggable={false}
                   />
-                  
-                  {/* Drag handle indicator */}
-                  <div className="absolute inset-0 border-2 border-dashed border-white/50 rounded-full flex items-center justify-center">
-                    <div className="bg-white/80 rounded-full p-2">
-                      <Move className="w-4 h-4 text-black" />
-                    </div>
-                  </div>
                 </div>
               )}
               
@@ -357,65 +373,168 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
             </div>
 
             {/* Controls */}
-            <div className="p-4 space-y-4 border-t bg-background">
-              {/* Size slider */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Размер</span>
-                  <div className="flex gap-1">
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={() => setWheelSize(s => Math.max(5, s - 2))}
-                    >
-                      <ZoomOut className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={() => setWheelSize(s => Math.min(50, s + 2))}
-                    >
-                      <ZoomIn className="w-4 h-4" />
-                    </Button>
+            <div className="p-4 space-y-3 border-t bg-background">
+              {/* Tabs */}
+              <div className="flex gap-2 border-b pb-2">
+                <Button 
+                  variant={activeTab === 'size' ? 'default' : 'ghost'} 
+                  size="sm"
+                  onClick={() => setActiveTab('size')}
+                  className="flex-1"
+                >
+                  <Maximize2 className="w-4 h-4 mr-1" />
+                  Размер
+                </Button>
+                <Button 
+                  variant={activeTab === 'rotate' ? 'default' : 'ghost'} 
+                  size="sm"
+                  onClick={() => setActiveTab('rotate')}
+                  className="flex-1"
+                >
+                  <RotateCw className="w-4 h-4 mr-1" />
+                  Поворот
+                </Button>
+              </div>
+
+              {activeTab === 'size' && (
+                <>
+                  {/* Width */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1 min-w-[70px]">
+                      <FlipHorizontal className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-xs">Ширина</span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7"
+                        onClick={() => setWheelScaleX(s => Math.max(5, s - 2))}
+                      >
+                        <ZoomOut className="w-3 h-3" />
+                      </Button>
+                      <Slider
+                        value={[wheelScaleX]}
+                        min={3}
+                        max={100}
+                        step={1}
+                        onValueChange={([v]) => setWheelScaleX(v)}
+                        className="flex-1"
+                      />
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7"
+                        onClick={() => setWheelScaleX(s => Math.min(100, s + 2))}
+                      >
+                        <ZoomIn className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <Slider
-                  value={[wheelSize]}
-                  onValueChange={([v]) => setWheelSize(v)}
-                  min={5}
-                  max={50}
-                  step={1}
-                />
-              </div>
 
-              {/* Rotation slider */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Поворот</span>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setWheelRotation(0)}
-                  >
-                    <RotateCcw className="w-4 h-4 mr-1" />
-                    Сброс
-                  </Button>
-                </div>
-                <Slider
-                  value={[wheelRotation]}
-                  onValueChange={([v]) => setWheelRotation(v)}
-                  min={-180}
-                  max={180}
-                  step={1}
-                />
-              </div>
+                  {/* Height */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1 min-w-[70px]">
+                      <FlipVertical className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-xs">Высота</span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7"
+                        onClick={() => setWheelScaleY(s => Math.max(5, s - 2))}
+                      >
+                        <ZoomOut className="w-3 h-3" />
+                      </Button>
+                      <Slider
+                        value={[wheelScaleY]}
+                        min={3}
+                        max={100}
+                        step={1}
+                        onValueChange={([v]) => setWheelScaleY(v)}
+                        className="flex-1"
+                      />
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7"
+                        onClick={() => setWheelScaleY(s => Math.min(100, s + 2))}
+                      >
+                        <ZoomIn className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              )}
 
-              {/* Action buttons */}
-              <div className="flex gap-2">
+              {activeTab === 'rotate' && (
+                <>
+                  {/* Rotate Z (normal rotation) */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1 min-w-[80px]">
+                      <span className="text-xs font-medium text-primary">Z</span>
+                      <span className="text-xs">Вращение</span>
+                    </div>
+                    <Slider
+                      value={[wheelRotateZ]}
+                      min={-180}
+                      max={180}
+                      step={1}
+                      onValueChange={([v]) => setWheelRotateZ(v)}
+                      className="flex-1"
+                    />
+                    <span className="text-xs text-muted-foreground w-10 text-right">{wheelRotateZ}°</span>
+                  </div>
+
+                  {/* Rotate X (tilt forward/backward) */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1 min-w-[80px]">
+                      <span className="text-xs font-medium text-green-500">X</span>
+                      <span className="text-xs">Наклон</span>
+                    </div>
+                    <Slider
+                      value={[wheelRotateX]}
+                      min={-90}
+                      max={90}
+                      step={1}
+                      onValueChange={([v]) => setWheelRotateX(v)}
+                      className="flex-1"
+                    />
+                    <span className="text-xs text-muted-foreground w-10 text-right">{wheelRotateX}°</span>
+                  </div>
+
+                  {/* Rotate Y (tilt left/right) */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1 min-w-[80px]">
+                      <span className="text-xs font-medium text-blue-500">Y</span>
+                      <span className="text-xs">Перспектива</span>
+                    </div>
+                    <Slider
+                      value={[wheelRotateY]}
+                      min={-90}
+                      max={90}
+                      step={1}
+                      onValueChange={([v]) => setWheelRotateY(v)}
+                      className="flex-1"
+                    />
+                    <span className="text-xs text-muted-foreground w-10 text-right">{wheelRotateY}°</span>
+                  </div>
+                </>
+              )}
+
+              <div className="flex gap-2 pt-2 border-t">
                 <Button 
                   variant="outline" 
+                  size="sm"
+                  onClick={resetWheel}
+                >
+                  <RotateCcw className="w-4 h-4 mr-1" />
+                  Сброс
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
                   className="flex-1"
                   onClick={saveImage}
                 >
@@ -423,6 +542,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
                   Сохранить
                 </Button>
                 <Button 
+                  size="sm"
                   className="flex-1"
                   onClick={onAddToCart}
                 >

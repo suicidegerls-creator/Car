@@ -10,16 +10,18 @@ import {
   RefreshCw, 
   ZoomIn, 
   ZoomOut,
-  Move,
   RotateCcw,
   ShoppingCart,
-  ChevronUp,
   ChevronDown,
   X,
   Download,
   Share2,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Maximize2,
+  FlipHorizontal,
+  FlipVertical,
+  RotateCw
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -48,8 +50,11 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
   
   // Wheel positioning state
   const [wheelPosition, setWheelPosition] = useState({ x: 50, y: 50 })
-  const [wheelScale, setWheelScale] = useState(30) // percentage of screen
-  const [wheelRotation, setWheelRotation] = useState(0)
+  const [wheelScaleX, setWheelScaleX] = useState(30) // ширина в процентах
+  const [wheelScaleY, setWheelScaleY] = useState(30) // высота в процентах
+  const [wheelRotateZ, setWheelRotateZ] = useState(0) // поворот по Z (обычный)
+  const [wheelRotateX, setWheelRotateX] = useState(0) // наклон вперед/назад
+  const [wheelRotateY, setWheelRotateY] = useState(0) // наклон влево/вправо
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   
@@ -57,6 +62,7 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
   const [showControls, setShowControls] = useState(true)
   const [showWheelPicker, setShowWheelPicker] = useState(false)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<'size' | 'rotate'>('size')
 
   const { addItem } = useCart()
 
@@ -178,14 +184,16 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
       const img = document.createElement('img')
       img.crossOrigin = 'anonymous'
       img.onload = () => {
-        const wheelSize = (wheelScale / 100) * Math.min(canvas.width, canvas.height)
-        const wheelX = (wheelPosition.x / 100) * canvas.width - wheelSize / 2
-        const wheelY = (wheelPosition.y / 100) * canvas.height - wheelSize / 2
+        const wheelWidth = (wheelScaleX / 100) * Math.min(canvas.width, canvas.height)
+        const wheelHeight = (wheelScaleY / 100) * Math.min(canvas.width, canvas.height)
+        const wheelX = (wheelPosition.x / 100) * canvas.width - wheelWidth / 2
+        const wheelY = (wheelPosition.y / 100) * canvas.height - wheelHeight / 2
 
         ctx.save()
-        ctx.translate(wheelX + wheelSize / 2, wheelY + wheelSize / 2)
-        ctx.rotate((wheelRotation * Math.PI) / 180)
-        ctx.drawImage(img, -wheelSize / 2, -wheelSize / 2, wheelSize, wheelSize)
+        ctx.translate(wheelX + wheelWidth / 2, wheelY + wheelHeight / 2)
+        ctx.rotate((wheelRotateZ * Math.PI) / 180)
+        // Note: 3D transforms can't be fully replicated in 2D canvas, but we apply basic rotation
+        ctx.drawImage(img, -wheelWidth / 2, -wheelHeight / 2, wheelWidth, wheelHeight)
         ctx.restore()
 
         // Get image data
@@ -239,8 +247,11 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
   // Reset position
   const resetPosition = () => {
     setWheelPosition({ x: 50, y: 50 })
-    setWheelScale(30)
-    setWheelRotation(0)
+    setWheelScaleX(30)
+    setWheelScaleY(30)
+    setWheelRotateZ(0)
+    setWheelRotateX(0)
+    setWheelRotateY(0)
   }
 
   // Loading state
@@ -303,7 +314,7 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
                 <p className="font-medium text-sm">{wheel.name}</p>
                 <p className="text-xs text-muted-foreground">{wheel.brand} R{wheel.diameter}</p>
               </div>
-              <p className="font-bold">{wheel.price.toLocaleString('ru-RU')} ₽</p>
+              <p className="font-bold">{wheel.price.toLocaleString('ru-RU')} BYN</p>
             </div>
           )}
           
@@ -413,17 +424,18 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
       {/* Hidden canvas for capture */}
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* Wheel overlay */}
+      {/* Wheel overlay with 3D transforms */}
       {wheel && wheel.images && wheel.images.length > 0 && (
         <div 
           className="wheel-overlay absolute cursor-move"
           style={{
             left: `${wheelPosition.x}%`,
             top: `${wheelPosition.y}%`,
-            width: `${wheelScale}vmin`,
-            height: `${wheelScale}vmin`,
-            transform: `translate(-50%, -50%) rotate(${wheelRotation}deg)`,
-            transition: isDragging ? 'none' : 'transform 0.1s ease-out'
+            width: `${wheelScaleX}vmin`,
+            height: `${wheelScaleY}vmin`,
+            transform: `translate(-50%, -50%) perspective(500px) rotateX(${wheelRotateX}deg) rotateY(${wheelRotateY}deg) rotateZ(${wheelRotateZ}deg)`,
+            transition: isDragging ? 'none' : 'transform 0.1s ease-out',
+            transformStyle: 'preserve-3d'
           }}
         >
           <Image
@@ -433,13 +445,6 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
             className="object-contain pointer-events-none"
             draggable={false}
           />
-          
-          {/* Drag indicator */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-            <div className="w-12 h-12 rounded-full bg-background/50 backdrop-blur-sm flex items-center justify-center">
-              <Move className="w-6 h-6" />
-            </div>
-          </div>
         </div>
       )}
 
@@ -542,50 +547,157 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
 
       {/* Controls panel */}
       {showControls && (
-        <div className="absolute bottom-24 left-4 right-4 bg-background/90 backdrop-blur-sm rounded-lg p-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm">Размер</span>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8"
-                onClick={() => setWheelScale(s => Math.max(10, s - 5))}
-              >
-                <ZoomOut className="w-4 h-4" />
-              </Button>
-              <Slider
-                value={[wheelScale]}
-                min={10}
-                max={60}
-                step={1}
-                onValueChange={([v]) => setWheelScale(v)}
-                className="w-32"
-              />
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8"
-                onClick={() => setWheelScale(s => Math.min(60, s + 5))}
-              >
-                <ZoomIn className="w-4 h-4" />
-              </Button>
-            </div>
+        <div className="absolute bottom-24 left-4 right-4 bg-background/90 backdrop-blur-sm rounded-lg p-4 space-y-3">
+          {/* Tabs */}
+          <div className="flex gap-2 border-b pb-2">
+            <Button 
+              variant={activeTab === 'size' ? 'default' : 'ghost'} 
+              size="sm"
+              onClick={() => setActiveTab('size')}
+              className="flex-1"
+            >
+              <Maximize2 className="w-4 h-4 mr-1" />
+              Размер
+            </Button>
+            <Button 
+              variant={activeTab === 'rotate' ? 'default' : 'ghost'} 
+              size="sm"
+              onClick={() => setActiveTab('rotate')}
+              className="flex-1"
+            >
+              <RotateCw className="w-4 h-4 mr-1" />
+              Поворот
+            </Button>
           </div>
 
-          <div className="flex items-center justify-between">
-            <span className="text-sm">Поворот</span>
-            <Slider
-              value={[wheelRotation]}
-              min={-180}
-              max={180}
-              step={1}
-              onValueChange={([v]) => setWheelRotation(v)}
-              className="w-48"
-            />
-          </div>
+          {activeTab === 'size' && (
+            <>
+              {/* Width */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1 min-w-[70px]">
+                  <FlipHorizontal className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-xs">Ширина</span>
+                </div>
+                <div className="flex items-center gap-2 flex-1">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-7 w-7"
+                    onClick={() => setWheelScaleX(s => Math.max(10, s - 5))}
+                  >
+                    <ZoomOut className="w-3 h-3" />
+                  </Button>
+                  <Slider
+                    value={[wheelScaleX]}
+                    min={5}
+                    max={100}
+                    step={1}
+                    onValueChange={([v]) => setWheelScaleX(v)}
+                    className="flex-1"
+                  />
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-7 w-7"
+                    onClick={() => setWheelScaleX(s => Math.min(100, s + 5))}
+                  >
+                    <ZoomIn className="w-3 h-3" />
+                  </Button>
+                </div>
+              </div>
 
-          <div className="flex gap-2">
+              {/* Height */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1 min-w-[70px]">
+                  <FlipVertical className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-xs">Высота</span>
+                </div>
+                <div className="flex items-center gap-2 flex-1">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-7 w-7"
+                    onClick={() => setWheelScaleY(s => Math.max(10, s - 5))}
+                  >
+                    <ZoomOut className="w-3 h-3" />
+                  </Button>
+                  <Slider
+                    value={[wheelScaleY]}
+                    min={5}
+                    max={100}
+                    step={1}
+                    onValueChange={([v]) => setWheelScaleY(v)}
+                    className="flex-1"
+                  />
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-7 w-7"
+                    onClick={() => setWheelScaleY(s => Math.min(100, s + 5))}
+                  >
+                    <ZoomIn className="w-3 h-3" />
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'rotate' && (
+            <>
+              {/* Rotate Z (normal rotation) */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1 min-w-[70px]">
+                  <span className="text-xs font-medium text-primary">Z</span>
+                  <span className="text-xs">Вращение</span>
+                </div>
+                <Slider
+                  value={[wheelRotateZ]}
+                  min={-180}
+                  max={180}
+                  step={1}
+                  onValueChange={([v]) => setWheelRotateZ(v)}
+                  className="flex-1"
+                />
+                <span className="text-xs text-muted-foreground w-8 text-right">{wheelRotateZ}°</span>
+              </div>
+
+              {/* Rotate X (tilt forward/backward) */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1 min-w-[70px]">
+                  <span className="text-xs font-medium text-green-500">X</span>
+                  <span className="text-xs">Наклон</span>
+                </div>
+                <Slider
+                  value={[wheelRotateX]}
+                  min={-90}
+                  max={90}
+                  step={1}
+                  onValueChange={([v]) => setWheelRotateX(v)}
+                  className="flex-1"
+                />
+                <span className="text-xs text-muted-foreground w-8 text-right">{wheelRotateX}°</span>
+              </div>
+
+              {/* Rotate Y (tilt left/right) */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1 min-w-[70px]">
+                  <span className="text-xs font-medium text-blue-500">Y</span>
+                  <span className="text-xs">Перспектива</span>
+                </div>
+                <Slider
+                  value={[wheelRotateY]}
+                  min={-90}
+                  max={90}
+                  step={1}
+                  onValueChange={([v]) => setWheelRotateY(v)}
+                  className="flex-1"
+                />
+                <span className="text-xs text-muted-foreground w-8 text-right">{wheelRotateY}°</span>
+              </div>
+            </>
+          )}
+
+          <div className="flex gap-2 pt-2 border-t">
             <Button 
               variant="outline" 
               size="sm" 
@@ -614,48 +726,39 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
           className="absolute bottom-24 left-1/2 -translate-x-1/2"
           onClick={() => setShowControls(true)}
         >
-          <ChevronUp className="w-4 h-4 mr-2" />
-          Настройки
+          Настройки диска
         </Button>
       )}
 
-      {/* Bottom bar */}
+      {/* Bottom action bar */}
       <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/50 to-transparent">
         <div className="flex items-center justify-center gap-4">
           <Button
-            variant="secondary"
-            size="lg"
-            className="rounded-full"
-            onClick={handleAddToCart}
+            variant="outline"
+            size="icon"
+            className="w-14 h-14 rounded-full bg-background/90"
+            onClick={onChangeWheel}
           >
-            <ShoppingCart className="w-5 h-5" />
+            <RefreshCw className="w-6 h-6" />
           </Button>
 
           <Button
-            size="lg"
-            className="w-16 h-16 rounded-full bg-white text-black hover:bg-white/90"
+            size="icon"
+            className="w-16 h-16 rounded-full"
             onClick={capturePhoto}
           >
-            <Camera className="w-6 h-6" />
+            <Camera className="w-8 h-8" />
           </Button>
 
-          <Link href={`/catalog/${wheel?.id}`}>
-            <Button
-              variant="secondary"
-              size="lg"
-              className="rounded-full"
-            >
-              Подробнее
-            </Button>
-          </Link>
+          <Button
+            variant="outline"
+            size="icon"
+            className="w-14 h-14 rounded-full bg-background/90"
+            onClick={handleAddToCart}
+          >
+            <ShoppingCart className="w-6 h-6" />
+          </Button>
         </div>
-      </div>
-
-      {/* Instructions overlay (first time) */}
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-        <p className="text-white/50 text-sm text-center px-8">
-          Перетащите диск на колесо автомобиля
-        </p>
       </div>
     </div>
   )
