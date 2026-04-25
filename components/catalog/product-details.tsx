@@ -221,7 +221,7 @@ export function ProductDetails({ wheel }: ProductDetailsProps) {
             <Button variant="secondary" className="flex-1" asChild>
               <Link href={`/ar-fitting?wheel=${wheel.id}`}>
                 <Camera className="w-4 h-4 mr-2" />
-                AR-примерка
+                ИИ-примерка
               </Link>
             </Button>
             <Button variant="outline" className="flex-1" asChild>

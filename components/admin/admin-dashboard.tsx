@@ -97,7 +97,7 @@ export function AdminDashboard() {
               <Package className="w-5 h-5 text-background" />
             </div>
             <div>
-              <h1 className="font-bold text-lg">DiskLand Admin</h1>
+              <h1 className="font-bold text-lg">ДискиБел Admin</h1>
               <p className="text-sm text-muted-foreground">Управление каталогом</p>
             </div>
           </div>

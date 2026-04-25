@@ -4,7 +4,7 @@ import { Footer } from '@/components/footer'
 import { CheckoutForm } from '@/components/checkout/checkout-form'
 
 export const metadata: Metadata = {
-  title: 'Оформление заказа | DiskLand',
+  title: 'Оформление заказа | ДискиБел',
   description: 'Оформите заказ на автомобильные диски с доставкой по Беларуси',
 }
 

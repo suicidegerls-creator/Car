@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
             [
               {
                 text: '📋 Открыть в админке',
-                url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://car-two-beta-48.vercel.app'}/admin?token=diskland-admin-2024`
+                url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://car-two-beta-48.vercel.app'}/admin?token=diskibel-admin-2024`
               }
             ]
           ]

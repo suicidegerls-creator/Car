@@ -65,7 +65,7 @@ ${itemsList}
       [
         {
           text: 'Открыть',
-          url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://car-two-beta-48.vercel.app'}/admin?token=diskland-admin-2024`
+          url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://car-two-beta-48.vercel.app'}/admin?token=diskibel-admin-2024`
         }
       ]
     ]
@@ -184,7 +184,7 @@ ${request.message}
       [
         {
           text: 'Открыть',
-          url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://car-two-beta-48.vercel.app'}/admin?token=diskland-admin-2024&tab=support`
+          url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://car-two-beta-48.vercel.app'}/admin?token=diskibel-admin-2024&tab=support`
         }
       ]
     ]

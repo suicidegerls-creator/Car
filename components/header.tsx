@@ -5,15 +5,18 @@ import { Menu, X, Search, User, LogIn } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { CartSheet } from "@/components/cart/cart-sheet"
+import { WheelLogo } from "@/components/ui/wheel-logo"
 import { createClient } from "@/lib/supabase/client"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 
 const navItems = [
   { name: "Каталог", href: "/catalog" },
-  { name: "AR-примерка", href: "/ar-fitting" },
   { name: "О компании", href: "/about" },
   { name: "Контакты", href: "/contacts" },
 ]
+
+const aiFeature = { name: "ИИ-примерка", href: "/ar-fitting" }
+const wheelFeature = { name: "Колесо Удачи", href: "/wheel" }
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -39,17 +42,15 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-foreground flex items-center justify-center">
-              <span className="text-background font-bold text-lg">D</span>
-            </div>
+          <Link href="/" className="flex items-center gap-2.5">
+            <WheelLogo size={38} className="text-primary" />
             <span className="font-bold text-xl tracking-tight text-foreground">
-              DiskLand
+              ДискиБел
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
               <Link
                 key={item.name}
@@ -59,6 +60,29 @@ export function Header() {
                 {item.name}
               </Link>
             ))}
+            <Link
+              href={aiFeature.href}
+              className="relative ml-2 px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-semibold tracking-wide uppercase transition-all hover:scale-105 hover:shadow-lg shadow-primary/25"
+            >
+              <span className="relative z-10">{aiFeature.name}</span>
+              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-accent"></span>
+              </span>
+            </Link>
+            <Link
+              href={wheelFeature.href}
+              className="relative ml-1 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full text-sm font-semibold tracking-wide uppercase transition-all hover:scale-105 hover:shadow-lg shadow-orange-500/25 overflow-hidden"
+            >
+              <span className="relative z-10 flex items-center gap-1.5">
+                <svg className="w-4 h-4 animate-spin-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 2v10l7 4" />
+                </svg>
+                {wheelFeature.name}
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-transparent animate-pulse"></span>
+            </Link>
           </nav>
 
           {/* Desktop Actions */}
@@ -110,6 +134,22 @@ export function Header() {
                 {item.name}
               </Link>
             ))}
+            <Link
+              href={aiFeature.href}
+              className="block mt-4 px-4 py-3 bg-primary text-primary-foreground rounded-xl text-center text-lg font-semibold shadow-lg"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {aiFeature.name}
+              <span className="ml-2 text-xs bg-accent text-accent-foreground px-2 py-0.5 rounded-full">NEW</span>
+            </Link>
+            <Link
+              href={wheelFeature.href}
+              className="block mt-2 px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-center text-lg font-semibold shadow-lg"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {wheelFeature.name}
+              <span className="ml-2 text-xs bg-white/20 px-2 py-0.5 rounded-full">-5%</span>
+            </Link>
             <div className="flex items-center gap-4 pt-4 border-t border-border">
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
                 <Search className="w-5 h-5" />

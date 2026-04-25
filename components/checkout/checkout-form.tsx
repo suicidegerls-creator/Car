@@ -17,8 +17,15 @@ import {
   SelectValue 
 } from '@/components/ui/select'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Loader2, ShoppingBag, CheckCircle, Truck, Phone, MapPin, Store, Banknote, CreditCard } from 'lucide-react'
+import { Loader2, ShoppingBag, CheckCircle, Truck, Phone, MapPin, Store, Banknote, CreditCard, Percent, Gift } from 'lucide-react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+
+interface ActiveDiscount {
+  id: string
+  discount_percent: number
+  expires_at: string
+}
 
 const CITIES = [
   'Минск',
@@ -63,11 +70,42 @@ export function CheckoutForm() {
     payment_method: 'cash' as 'cash' | 'card',
   })
   
+  const [activeDiscount, setActiveDiscount] = useState<ActiveDiscount | null>(null)
+  const [discountApplied, setDiscountApplied] = useState(false)
+  
   // Стоимость доставки (бесплатно при заказе от 500 BYN или самовывозе)
   const deliveryCost = formData.delivery_type === 'pickup' ? 0 : (getTotalPrice() >= 500 ? 0 : 30)
+  
+  // Расчет скидки
+  const discountAmount = discountApplied && activeDiscount 
+    ? Math.round(getTotalPrice() * activeDiscount.discount_percent / 100) 
+    : 0
 
   useEffect(() => {
     setMounted(true)
+    
+    // Проверяем наличие активной скидки
+    const checkDiscount = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (user) {
+        try {
+          const res = await fetch('/api/wheel')
+          if (res.ok) {
+            const data = await res.json()
+            if (data.activeDiscount && data.activeDiscount.discount_percent > 0) {
+              setActiveDiscount(data.activeDiscount)
+              setDiscountApplied(true) // Автоматически применяем
+            }
+          }
+        } catch (e) {
+          console.error('Failed to check discount:', e)
+        }
+      }
+    }
+    
+    checkDiscount()
   }, [])
 
   const totalPrice = mounted ? getTotalPrice() : 0
@@ -90,6 +128,9 @@ export function CheckoutForm() {
         body: JSON.stringify({
           ...formData,
           items,
+          discount_id: discountApplied && activeDiscount ? activeDiscount.id : null,
+          discount_percent: discountApplied && activeDiscount ? activeDiscount.discount_percent : 0,
+          discount_amount: discountAmount,
         }),
       })
 
@@ -452,6 +493,17 @@ export function CheckoutForm() {
                   {deliveryCost === 0 ? 'Бесплатно' : `${deliveryCost} BYN`}
                 </span>
               </div>
+              {activeDiscount && activeDiscount.discount_percent > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground flex items-center gap-1">
+                    <Gift className="w-3.5 h-3.5" />
+                    Скидка ({activeDiscount.discount_percent}%):
+                  </span>
+                  <span className="text-green-600 font-medium">
+                    -{discountAmount.toLocaleString('be-BY')} BYN
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Оплата:</span>
                 <span>{formData.payment_method === 'cash' ? 'Наличными' : 'Картой'}</span>
@@ -463,9 +515,16 @@ export function CheckoutForm() {
             <div className="flex justify-between items-center">
               <span className="font-medium">Итого к оплате:</span>
               <span className="text-xl font-bold">
-                {(totalPrice + deliveryCost).toLocaleString('be-BY')} BYN
+                {(totalPrice + deliveryCost - discountAmount).toLocaleString('be-BY')} BYN
               </span>
             </div>
+            
+            {activeDiscount && activeDiscount.discount_percent > 0 && (
+              <div className="bg-primary/10 text-primary text-sm p-3 rounded-lg flex items-center gap-2">
+                <Percent className="w-4 h-4 flex-shrink-0" />
+                <span>Скидка {activeDiscount.discount_percent}% с Колеса Удачи применена!</span>
+              </div>
+            )}
 
             {deliveryCost === 0 && formData.delivery_type === 'delivery' && (
               <div className="bg-green-500/10 text-green-600 text-sm p-3 rounded-lg text-center">

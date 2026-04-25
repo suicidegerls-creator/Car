@@ -61,7 +61,7 @@ export const useCart = create<CartStore>()(
       },
     }),
     {
-      name: 'diskland-cart',
+      name: 'diskibel-cart',
     }
   )
 )

@@ -2,12 +2,13 @@
 
 import Link from "next/link"
 import { Send } from "lucide-react"
+import { WheelLogo } from "@/components/ui/wheel-logo"
 import { Button } from "@/components/ui/button"
 
 const footerLinks = {
   catalog: [
     { name: "Все диски", href: "/catalog" },
-    { name: "AR-примерка", href: "/ar-fitting" },
+    { name: "ИИ-примерка", href: "/ar-fitting" },
     { name: "Бренды", href: "/#brands" },
   ],
   company: [
@@ -31,12 +32,10 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-full bg-foreground flex items-center justify-center">
-                <span className="text-background font-bold text-lg">D</span>
-              </div>
+            <Link href="/" className="flex items-center gap-2.5 mb-4">
+              <WheelLogo size={38} className="text-primary" />
               <span className="font-bold text-xl tracking-tight text-foreground">
-                DiskLand
+                ДискиБел
               </span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-sm mb-6">
@@ -109,7 +108,7 @@ export function Footer() {
         {/* Bottom */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-muted-foreground text-sm">
-            © 2026 DiskLand. Все права защищены.
+            © 2026 ДискиБел. Все права защищены.
           </p>
           <div className="flex items-center gap-6 text-muted-foreground text-sm">
             <Link href="#" className="hover:text-foreground transition-colors">

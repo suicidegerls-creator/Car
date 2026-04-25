@@ -12,24 +12,24 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 export const metadata: Metadata = {
   metadataBase: new URL('https://car-two-beta-48.vercel.app'),
   title: {
-    default: 'DiskLand — Премиальные литые диски в Минске',
-    template: '%s | DiskLand',
+    default: 'ДискиБел — Премиальные литые диски в Минске',
+    template: '%s | ДискиБел',
   },
   description: 'Магазин премиальных литых дисков в Минске. Оригинальная продукция BBS, OZ Racing, Enkei, Vossen. Доставка по Беларуси. +375 (29) 657-69-60',
   keywords: ['литые диски', 'диски Минск', 'автомобильные диски', 'BBS', 'OZ Racing', 'купить диски Беларусь', 'кованые диски'],
-  authors: [{ name: 'DiskLand' }],
+  authors: [{ name: 'ДискиБел' }],
   generator: 'v0.app',
   openGraph: {
     type: 'website',
     locale: 'ru_BY',
     url: 'https://car-two-beta-48.vercel.app',
-    siteName: 'DiskLand',
-    title: 'DiskLand — Премиальные литые диски в Минске',
+    siteName: 'ДискиБел',
+    title: 'ДискиБел — Премиальные литые диски в Минске',
     description: 'Магазин премиальных литых дисков в Минске. Оригинальная продукция от ведущих мировых производителей.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'DiskLand — Премиальные литые диски',
+    title: 'ДискиБел — Премиальные литые диски',
     description: 'Магазин премиальных литых дисков в Минске',
   },
   robots: {
@@ -62,7 +62,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased bg-background text-foreground">
         <SupportProvider>
           {children}
           <SupportWidget />
@@ -71,7 +71,7 @@ export default function RootLayout({
           position="bottom-right" 
           richColors 
           closeButton
-          theme="dark"
+          theme="light"
         />
         <Analytics />
       </body>

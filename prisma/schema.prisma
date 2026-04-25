@@ -1,0 +1,222 @@
+// Prisma schema - синхронизировано с Supabase БД
+// Последнее обновление: полная синхронизация с реальной структурой
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+// ============================================
+// МАРКИ И МОДЕЛИ АВТОМОБИЛЕЙ
+// ============================================
+
+model CarBrand {
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String     @unique
+  name_ru    String?
+  logo_url   String?
+  sort_order Int?       @default(0)
+  is_popular Boolean?   @default(false)
+  created_at DateTime?  @default(now()) @db.Timestamptz(6)
+  
+  models     CarModel[]
+
+  @@map("car_brands")
+}
+
+model CarModel {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  brand_id   String    @db.Uuid
+  name       String
+  years_from Int?
+  years_to   Int?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  
+  brand      CarBrand  @relation(fields: [brand_id], references: [id])
+
+  @@map("car_models")
+}
+
+// ============================================
+// ДИСКИ
+// ============================================
+
+model Wheel {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String
+  brand             String
+  model             String?
+  sku               String?            @unique
+  description       String?
+  price             Decimal            @db.Decimal
+  old_price         Decimal?           @db.Decimal
+  in_stock          Boolean?           @default(true)
+  quantity          Int?               @default(0)
+  wheel_type        String             // 'forged', 'cast', 'stamped'
+  diameter          Int
+  width             Decimal            @db.Decimal
+  pcd               String
+  et                Int
+  center_bore       Decimal            @db.Decimal
+  bolts_count       Int?
+  color             String?
+  finish            String?
+  material          String?
+  weight            Decimal?           @db.Decimal
+  country           String?
+  images            String[]           @default([])
+  image_transparent String?
+  slug              String?            @unique
+  meta_title        String?
+  meta_description  String?
+  is_universal      Boolean?           @default(false)
+  created_at        DateTime?          @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime?          @default(now()) @db.Timestamptz(6)
+  
+  car_compatibility CarCompatibility[]
+  favorites         Favorite[]
+
+  @@map("wheels")
+}
+
+model CarCompatibility {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  wheel_id         String    @db.Uuid
+  car_brand        String
+  car_model        String
+  car_year_from    Int?
+  car_year_to      Int?
+  car_modification String?
+  all_models       Boolean?  @default(false)
+  created_at       DateTime? @default(now()) @db.Timestamptz(6)
+  
+  wheel            Wheel     @relation(fields: [wheel_id], references: [id])
+
+  @@map("car_compatibility")
+}
+
+// ============================================
+// ИЗБРАННОЕ
+// ============================================
+
+model Favorite {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String?   @db.Uuid
+  session_id String?
+  wheel_id   String    @db.Uuid
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  
+  wheel      Wheel     @relation(fields: [wheel_id], references: [id])
+
+  @@map("favorites")
+}
+
+// ============================================
+// ПРОФИЛИ ПОЛЬЗОВАТЕЛЕЙ
+// ============================================
+
+model Profile {
+  id         String    @id @db.Uuid
+  full_name  String?
+  phone      String?
+  city       String?
+  address    String?
+  first_name String?
+  last_name  String?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@map("profiles")
+}
+
+// ============================================
+// ЗАКАЗЫ
+// ============================================
+
+model Order {
+  id               String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  status           String      @default("pending") // pending, confirmed, processing, shipped, delivered, cancelled
+  customer_name    String
+  customer_phone   String
+  customer_email   String?
+  delivery_city    String
+  delivery_address String
+  delivery_comment String?
+  delivery_type    String?     @default("delivery")
+  delivery_cost    Decimal?    @default(0) @db.Decimal
+  payment_method   String?     @default("cash")
+  total_amount     Decimal     @db.Decimal
+  items_count      Int         @default(0)
+  created_at       DateTime?   @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime?   @default(now()) @db.Timestamptz(6)
+  
+  items            OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id    String    @db.Uuid
+  wheel_id    String    @db.Uuid
+  wheel_name  String
+  wheel_brand String
+  wheel_sku   String?
+  wheel_image String?
+  diameter    Int?
+  width       Decimal?  @db.Decimal
+  pcd         String?
+  et          Int?
+  price       Decimal   @db.Decimal
+  quantity    Int       @default(1)
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  
+  order       Order     @relation(fields: [order_id], references: [id])
+
+  @@map("order_items")
+}
+
+// ============================================
+// ОБРАЩЕНИЯ В ПОДДЕРЖКУ
+// ============================================
+
+model SupportRequest {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  status         String    @default("new") // new, in_progress, resolved, closed
+  customer_name  String
+  customer_phone String
+  customer_email String?
+  subject        String
+  message        String
+  admin_response String?
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@map("support_requests")
+}
+
+// ============================================
+// СКИДКИ ПОЛЬЗОВАТЕЛЕЙ (КОЛЕСО УДАЧИ)
+// ============================================
+
+model UserDiscount {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id          String    @db.Uuid
+  discount_percent Int       // 0-5
+  spun_at          DateTime  @default(now()) @db.Timestamptz(6)
+  expires_at       DateTime  @db.Timestamptz(6)
+  activated_at     DateTime? @db.Timestamptz(6)
+  used_at          DateTime? @db.Timestamptz(6)
+  order_id         String?   @db.Uuid
+  created_at       DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([user_id])
+  @@index([expires_at])
+  @@index([spun_at])
+  @@map("user_discounts")
+}
