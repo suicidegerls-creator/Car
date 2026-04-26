@@ -6,13 +6,6 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, ChevronDown } from "lucide-react"
 
-// Локальные пути к изображениям дисков
-const WHEEL_IMAGES = {
-  wheel1: "/images/wheels/wheel-1.png",
-  wheel2: "/images/wheels/wheel-2.png",
-  wheel3: "/images/wheels/wheel-3.png",
-}
-
 export function HeroSection() {
   const [visible, setVisible] = useState([false, false, false])
 
@@ -56,7 +49,7 @@ export function HeroSection() {
           {/* Верхний ряд */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 lg:gap-12 mb-6 sm:mb-8">
             
-            {/* Диск 1 */}
+            {/* Диск 1 - Черный 5-спицевый агрессивный */}
             <div 
               className={`transition-all duration-1000 ease-out ${
                 visible[0] 
@@ -64,13 +57,13 @@ export function HeroSection() {
                   : 'opacity-0 -translate-x-12 -rotate-12'
               }`}
             >
-              <div className="w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 hover:scale-110 transition-transform duration-300 drop-shadow-2xl">
-                <Image 
-                  src={WHEEL_IMAGES.wheel1} 
-                  alt="Премиальный диск" 
-                  width={176} 
-                  height={176} 
-                  className="w-full h-full object-contain"
+              <div className="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 hover:scale-110 transition-transform duration-300 drop-shadow-2xl relative">
+                <Image
+                  src="/images/hero-wheel-1.png"
+                  alt="Литой диск премиум класса"
+                  fill
+                  className="object-contain mix-blend-multiply dark:mix-blend-lighten"
+                  priority
                 />
               </div>
             </div>
@@ -92,7 +85,7 @@ export function HeroSection() {
               </Link>
             </div>
 
-            {/* Диск 2 */}
+            {/* Диск 2 - Черный 10-спицевый спортивный */}
             <div 
               className={`transition-all duration-1000 ease-out ${
                 visible[1] 
@@ -100,19 +93,18 @@ export function HeroSection() {
                   : 'opacity-0 translate-x-12 rotate-12'
               }`}
             >
-              <div className="w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 hover:scale-110 transition-transform duration-300 drop-shadow-2xl">
-                <Image 
-                  src={WHEEL_IMAGES.wheel2} 
-                  alt="Спортивный диск" 
-                  width={176} 
-                  height={176} 
-                  className="w-full h-full object-contain"
+              <div className="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 hover:scale-110 transition-transform duration-300 drop-shadow-2xl relative">
+                <Image
+                  src="/images/hero-wheel-2.png"
+                  alt="Спортивный литой диск"
+                  fill
+                  className="object-contain mix-blend-multiply dark:mix-blend-lighten"
                 />
               </div>
             </div>
           </div>
 
-          {/* Диск 3 снизу */}
+          {/* Диск 3 снизу - Двухцветный премиум */}
           <div 
             className={`transition-all duration-1000 ease-out ${
               visible[2] 
@@ -120,13 +112,12 @@ export function HeroSection() {
                 : 'opacity-0 translate-y-12 rotate-6'
             }`}
           >
-            <div className="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 hover:scale-110 transition-transform duration-300 drop-shadow-2xl">
-              <Image 
-                src={WHEEL_IMAGES.wheel3} 
-                alt="Премиум диск" 
-                width={192} 
-                height={192} 
-                className="w-full h-full object-contain"
+            <div className="w-36 h-36 sm:w-44 sm:h-44 lg:w-52 lg:h-52 hover:scale-110 transition-transform duration-300 drop-shadow-2xl relative">
+              <Image
+                src="/images/hero-wheel-3.png"
+                alt="Премиальный кованый диск"
+                fill
+                className="object-contain mix-blend-multiply dark:mix-blend-lighten"
               />
             </div>
           </div>
