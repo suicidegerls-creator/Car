@@ -5,297 +5,189 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, ChevronDown } from "lucide-react"
 
-// Реалистичный диск 1 - Классический 5-спицевый
+// Диск 1 - 5 симметричных широких спиц
 function PremiumWheel1({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 200 200" className={className}>
       <defs>
-        {/* Градиент для обода */}
-        <linearGradient id="rimGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#8B8B8B" />
-          <stop offset="30%" stopColor="#C0C0C0" />
-          <stop offset="50%" stopColor="#E8E8E8" />
-          <stop offset="70%" stopColor="#A0A0A0" />
-          <stop offset="100%" stopColor="#707070" />
+        <linearGradient id="rim1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#888" />
+          <stop offset="50%" stopColor="#ddd" />
+          <stop offset="100%" stopColor="#666" />
         </linearGradient>
-        {/* Градиент для спиц */}
-        <linearGradient id="spokeGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#A8A8A8" />
-          <stop offset="50%" stopColor="#E0E0E0" />
-          <stop offset="100%" stopColor="#888888" />
+        <linearGradient id="spoke1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#bbb" />
+          <stop offset="50%" stopColor="#f0f0f0" />
+          <stop offset="100%" stopColor="#999" />
         </linearGradient>
-        {/* Градиент центра */}
-        <radialGradient id="centerGradient1" cx="40%" cy="40%">
-          <stop offset="0%" stopColor="#F0F0F0" />
-          <stop offset="50%" stopColor="#C0C0C0" />
-          <stop offset="100%" stopColor="#606060" />
+        <radialGradient id="center1" cx="30%" cy="30%">
+          <stop offset="0%" stopColor="#eee" />
+          <stop offset="100%" stopColor="#666" />
         </radialGradient>
-        {/* Тень */}
-        <filter id="shadow1" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="2" dy="4" stdDeviation="4" floodOpacity="0.3" />
-        </filter>
       </defs>
       
-      <g filter="url(#shadow1)">
-        {/* Шина */}
-        <circle cx="100" cy="100" r="98" fill="#1a1a1a" />
-        <circle cx="100" cy="100" r="96" fill="#2d2d2d" />
-        <circle cx="100" cy="100" r="94" stroke="#3d3d3d" strokeWidth="1" fill="none" />
-        
-        {/* Внешний обод */}
-        <circle cx="100" cy="100" r="85" fill="url(#rimGradient1)" />
-        <circle cx="100" cy="100" r="83" stroke="#999" strokeWidth="1" fill="none" />
-        <circle cx="100" cy="100" r="78" fill="#1a1a1a" />
-        
-        {/* 5 спиц */}
-        {[0, 72, 144, 216, 288].map((angle, i) => {
-          const rad = (angle - 90) * Math.PI / 180
-          const rad2 = (angle - 90 + 15) * Math.PI / 180
-          const rad3 = (angle - 90 - 15) * Math.PI / 180
-          return (
-            <path
-              key={i}
-              d={`
-                M ${100 + 22 * Math.cos(rad3)} ${100 + 22 * Math.sin(rad3)}
-                L ${100 + 75 * Math.cos(rad3 + 0.08)} ${100 + 75 * Math.sin(rad3 + 0.08)}
-                A 75 75 0 0 1 ${100 + 75 * Math.cos(rad2 - 0.08)} ${100 + 75 * Math.sin(rad2 - 0.08)}
-                L ${100 + 22 * Math.cos(rad2)} ${100 + 22 * Math.sin(rad2)}
-                Z
-              `}
-              fill="url(#spokeGradient1)"
-              stroke="#666"
-              strokeWidth="0.5"
-            />
-          )
-        })}
-        
-        {/* Центральная часть */}
-        <circle cx="100" cy="100" r="24" fill="url(#centerGradient1)" />
-        <circle cx="100" cy="100" r="22" stroke="#888" strokeWidth="1" fill="none" />
-        
-        {/* Болты */}
-        {[0, 72, 144, 216, 288].map((angle, i) => {
-          const rad = (angle - 90) * Math.PI / 180
-          return (
-            <g key={`bolt-${i}`}>
-              <circle 
-                cx={100 + 15 * Math.cos(rad)} 
-                cy={100 + 15 * Math.sin(rad)} 
-                r="4" 
-                fill="#888"
-              />
-              <circle 
-                cx={100 + 15 * Math.cos(rad) - 1} 
-                cy={100 + 15 * Math.sin(rad) - 1} 
-                r="2" 
-                fill="#bbb"
-              />
-            </g>
-          )
-        })}
-        
-        {/* Центральный колпачок */}
-        <circle cx="100" cy="100" r="10" fill="#333" />
-        <circle cx="98" cy="98" r="4" fill="#555" />
-      </g>
+      {/* Шина */}
+      <circle cx="100" cy="100" r="98" fill="#1a1a1a" />
+      <circle cx="100" cy="100" r="94" fill="#252525" />
+      
+      {/* Обод */}
+      <circle cx="100" cy="100" r="82" fill="url(#rim1)" />
+      <circle cx="100" cy="100" r="78" fill="#1a1a1a" />
+      
+      {/* 5 спиц - симметричные, каждые 72 градуса */}
+      {/* Спица 1: 90° (вверх) */}
+      <polygon points="95,75 100,25 105,75 105,35 95,35" fill="url(#spoke1)" />
+      {/* Спица 2: 162° */}
+      <polygon points="78,82 35,52 83,87 42,62 38,67" fill="url(#spoke1)" />
+      {/* Спица 3: 234° */}
+      <polygon points="80,112 42,155 85,115 48,148 53,152" fill="url(#spoke1)" />
+      {/* Спица 4: 306° */}
+      <polygon points="115,115 152,152 120,112 158,148 153,155" fill="url(#spoke1)" />
+      {/* Спица 5: 18° */}
+      <polygon points="117,87 158,67 122,82 165,52 162,57" fill="url(#spoke1)" />
+      
+      {/* Центр */}
+      <circle cx="100" cy="100" r="28" fill="url(#center1)" />
+      <circle cx="100" cy="100" r="24" stroke="#888" strokeWidth="2" fill="none" />
+      
+      {/* 5 болтов */}
+      <circle cx="100" cy="82" r="5" fill="#555" />
+      <circle cx="117" cy="89" r="5" fill="#555" />
+      <circle cx="111" cy="110" r="5" fill="#555" />
+      <circle cx="89" cy="110" r="5" fill="#555" />
+      <circle cx="83" cy="89" r="5" fill="#555" />
+      
+      {/* Колпачок */}
+      <circle cx="100" cy="100" r="12" fill="#333" />
+      <circle cx="97" cy="97" r="5" fill="#555" />
     </svg>
   )
 }
 
-// Реалистичный диск 2 - Многоспицевый спортивный
+// Диск 2 - 10 тонких спиц спортивный
 function PremiumWheel2({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 200 200" className={className}>
       <defs>
-        <linearGradient id="rimGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#707070" />
-          <stop offset="40%" stopColor="#B8B8B8" />
-          <stop offset="60%" stopColor="#D0D0D0" />
-          <stop offset="100%" stopColor="#606060" />
+        <linearGradient id="rim2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#777" />
+          <stop offset="50%" stopColor="#ccc" />
+          <stop offset="100%" stopColor="#555" />
         </linearGradient>
-        <linearGradient id="spokeGradient2" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#C8C8C8" />
-          <stop offset="50%" stopColor="#F0F0F0" />
-          <stop offset="100%" stopColor="#909090" />
+        <linearGradient id="spoke2" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#ccc" />
+          <stop offset="50%" stopColor="#fff" />
+          <stop offset="100%" stopColor="#aaa" />
         </linearGradient>
-        <radialGradient id="centerGradient2" cx="35%" cy="35%">
-          <stop offset="0%" stopColor="#E8E8E8" />
-          <stop offset="60%" stopColor="#A0A0A0" />
-          <stop offset="100%" stopColor="#505050" />
+        <radialGradient id="center2" cx="30%" cy="30%">
+          <stop offset="0%" stopColor="#ddd" />
+          <stop offset="100%" stopColor="#555" />
         </radialGradient>
-        <filter id="shadow2" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="3" dy="5" stdDeviation="5" floodOpacity="0.35" />
-        </filter>
       </defs>
       
-      <g filter="url(#shadow2)">
-        {/* Шина */}
-        <circle cx="100" cy="100" r="98" fill="#151515" />
-        <circle cx="100" cy="100" r="95" fill="#252525" />
-        
-        {/* Обод */}
-        <circle cx="100" cy="100" r="86" fill="url(#rimGradient2)" />
-        <circle cx="100" cy="100" r="84" stroke="#aaa" strokeWidth="0.5" fill="none" />
-        <circle cx="100" cy="100" r="76" fill="#181818" />
-        
-        {/* 10 тонких спиц */}
-        {Array.from({ length: 10 }).map((_, i) => {
-          const angle = i * 36 - 90
-          const rad = angle * Math.PI / 180
-          const rad1 = (angle - 6) * Math.PI / 180
-          const rad2 = (angle + 6) * Math.PI / 180
-          return (
-            <path
-              key={i}
-              d={`
-                M ${100 + 20 * Math.cos(rad1)} ${100 + 20 * Math.sin(rad1)}
-                L ${100 + 73 * Math.cos(rad1 + 0.02)} ${100 + 73 * Math.sin(rad1 + 0.02)}
-                L ${100 + 73 * Math.cos(rad2 - 0.02)} ${100 + 73 * Math.sin(rad2 - 0.02)}
-                L ${100 + 20 * Math.cos(rad2)} ${100 + 20 * Math.sin(rad2)}
-                Z
-              `}
-              fill="url(#spokeGradient2)"
-              stroke="#777"
-              strokeWidth="0.3"
-            />
-          )
-        })}
-        
-        {/* Внутреннее кольцо */}
-        <circle cx="100" cy="100" r="20" fill="url(#centerGradient2)" />
-        <circle cx="100" cy="100" r="18" stroke="#999" strokeWidth="1" fill="none" />
-        
-        {/* Болты */}
-        {[0, 72, 144, 216, 288].map((angle, i) => {
-          const rad = (angle - 90) * Math.PI / 180
-          return (
-            <circle 
-              key={`bolt-${i}`}
-              cx={100 + 12 * Math.cos(rad)} 
-              cy={100 + 12 * Math.sin(rad)} 
-              r="3" 
-              fill="#666"
-              stroke="#888"
-              strokeWidth="0.5"
-            />
-          )
-        })}
-        
-        {/* Лого центр */}
-        <circle cx="100" cy="100" r="8" fill="#2a2a2a" />
-        <circle cx="98" cy="98" r="3" fill="#444" />
-      </g>
+      {/* Шина */}
+      <circle cx="100" cy="100" r="98" fill="#151515" />
+      <circle cx="100" cy="100" r="93" fill="#222" />
+      
+      {/* Обод */}
+      <circle cx="100" cy="100" r="84" fill="url(#rim2)" />
+      <circle cx="100" cy="100" r="80" fill="#181818" />
+      
+      {/* 10 тонких спиц - каждые 36 градусов */}
+      <line x1="100" y1="78" x2="100" y2="25" stroke="url(#spoke2)" strokeWidth="4" strokeLinecap="round" />
+      <line x1="113" y1="80" x2="147" y2="35" stroke="url(#spoke2)" strokeWidth="4" strokeLinecap="round" />
+      <line x1="120" y1="91" x2="170" y2="70" stroke="url(#spoke2)" strokeWidth="4" strokeLinecap="round" />
+      <line x1="120" y1="109" x2="170" y2="130" stroke="url(#spoke2)" strokeWidth="4" strokeLinecap="round" />
+      <line x1="113" y1="120" x2="147" y2="165" stroke="url(#spoke2)" strokeWidth="4" strokeLinecap="round" />
+      <line x1="100" y1="122" x2="100" y2="175" stroke="url(#spoke2)" strokeWidth="4" strokeLinecap="round" />
+      <line x1="87" y1="120" x2="53" y2="165" stroke="url(#spoke2)" strokeWidth="4" strokeLinecap="round" />
+      <line x1="80" y1="109" x2="30" y2="130" stroke="url(#spoke2)" strokeWidth="4" strokeLinecap="round" />
+      <line x1="80" y1="91" x2="30" y2="70" stroke="url(#spoke2)" strokeWidth="4" strokeLinecap="round" />
+      <line x1="87" y1="80" x2="53" y2="35" stroke="url(#spoke2)" strokeWidth="4" strokeLinecap="round" />
+      
+      {/* Центр */}
+      <circle cx="100" cy="100" r="22" fill="url(#center2)" />
+      <circle cx="100" cy="100" r="18" stroke="#777" strokeWidth="1.5" fill="none" />
+      
+      {/* 5 болтов */}
+      <circle cx="100" cy="86" r="4" fill="#555" />
+      <circle cx="113" cy="91" r="4" fill="#555" />
+      <circle cx="108" cy="106" r="4" fill="#555" />
+      <circle cx="92" cy="106" r="4" fill="#555" />
+      <circle cx="87" cy="91" r="4" fill="#555" />
+      
+      {/* Колпачок */}
+      <circle cx="100" cy="100" r="9" fill="#2a2a2a" />
+      <circle cx="98" cy="98" r="3" fill="#444" />
     </svg>
   )
 }
 
-// Реалистичный диск 3 - Кованый премиум
+// Диск 3 - 6 Y-образных широких спиц премиум
 function PremiumWheel3({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 200 200" className={className}>
       <defs>
-        <linearGradient id="rimGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#4a4a4a" />
-          <stop offset="25%" stopColor="#8a8a8a" />
-          <stop offset="50%" stopColor="#b0b0b0" />
-          <stop offset="75%" stopColor="#7a7a7a" />
-          <stop offset="100%" stopColor="#3a3a3a" />
+        <linearGradient id="rim3" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#666" />
+          <stop offset="50%" stopColor="#bbb" />
+          <stop offset="100%" stopColor="#444" />
         </linearGradient>
-        <linearGradient id="spokeGradient3" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#9a9a9a" />
-          <stop offset="30%" stopColor="#d8d8d8" />
-          <stop offset="70%" stopColor="#c0c0c0" />
-          <stop offset="100%" stopColor="#808080" />
+        <linearGradient id="spoke3" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#aaa" />
+          <stop offset="50%" stopColor="#e8e8e8" />
+          <stop offset="100%" stopColor="#888" />
         </linearGradient>
-        <radialGradient id="centerGradient3" cx="30%" cy="30%">
-          <stop offset="0%" stopColor="#d0d0d0" />
-          <stop offset="50%" stopColor="#909090" />
-          <stop offset="100%" stopColor="#404040" />
+        <radialGradient id="center3" cx="30%" cy="30%">
+          <stop offset="0%" stopColor="#ccc" />
+          <stop offset="100%" stopColor="#444" />
         </radialGradient>
-        <filter id="shadow3" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="2" dy="4" stdDeviation="6" floodOpacity="0.4" />
-        </filter>
-        <filter id="innerShadow3">
-          <feOffset dx="1" dy="1" />
-          <feGaussianBlur stdDeviation="1" result="offset-blur" />
-          <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse" />
-          <feFlood floodColor="black" floodOpacity="0.2" result="color" />
-          <feComposite operator="in" in="color" in2="inverse" result="shadow" />
-          <feComposite operator="over" in="shadow" in2="SourceGraphic" />
-        </filter>
       </defs>
       
-      <g filter="url(#shadow3)">
-        {/* Шина */}
-        <circle cx="100" cy="100" r="98" fill="#0f0f0f" />
-        <circle cx="100" cy="100" r="96" fill="#1f1f1f" />
-        <circle cx="100" cy="100" r="93" stroke="#333" strokeWidth="0.5" fill="none" />
-        
-        {/* Обод с канавкой */}
-        <circle cx="100" cy="100" r="87" fill="url(#rimGradient3)" />
-        <circle cx="100" cy="100" r="85" stroke="#666" strokeWidth="1.5" fill="none" />
-        <circle cx="100" cy="100" r="82" stroke="#444" strokeWidth="0.5" fill="none" />
-        <circle cx="100" cy="100" r="79" fill="#111" />
-        
-        {/* 6 широких Y-образных спиц */}
-        {Array.from({ length: 6 }).map((_, i) => {
-          const angle = i * 60 - 90
-          const rad = angle * Math.PI / 180
-          const rad1 = (angle - 12) * Math.PI / 180
-          const rad2 = (angle + 12) * Math.PI / 180
-          const rad3 = (angle - 5) * Math.PI / 180
-          const rad4 = (angle + 5) * Math.PI / 180
-          return (
-            <g key={i} filter="url(#innerShadow3)">
-              <path
-                d={`
-                  M ${100 + 25 * Math.cos(rad3)} ${100 + 25 * Math.sin(rad3)}
-                  L ${100 + 50 * Math.cos(rad1)} ${100 + 50 * Math.sin(rad1)}
-                  L ${100 + 76 * Math.cos(rad1 + 0.05)} ${100 + 76 * Math.sin(rad1 + 0.05)}
-                  A 76 76 0 0 1 ${100 + 76 * Math.cos(rad2 - 0.05)} ${100 + 76 * Math.sin(rad2 - 0.05)}
-                  L ${100 + 50 * Math.cos(rad2)} ${100 + 50 * Math.sin(rad2)}
-                  L ${100 + 25 * Math.cos(rad4)} ${100 + 25 * Math.sin(rad4)}
-                  Z
-                `}
-                fill="url(#spokeGradient3)"
-                stroke="#555"
-                strokeWidth="0.5"
-              />
-            </g>
-          )
-        })}
-        
-        {/* Центральная часть */}
-        <circle cx="100" cy="100" r="26" fill="url(#centerGradient3)" />
-        <circle cx="100" cy="100" r="24" stroke="#777" strokeWidth="1" fill="none" />
-        <circle cx="100" cy="100" r="20" stroke="#555" strokeWidth="0.5" fill="none" />
-        
-        {/* Болты */}
-        {[0, 72, 144, 216, 288].map((angle, i) => {
-          const rad = (angle - 90) * Math.PI / 180
-          return (
-            <g key={`bolt-${i}`}>
-              <circle 
-                cx={100 + 15 * Math.cos(rad)} 
-                cy={100 + 15 * Math.sin(rad)} 
-                r="4.5" 
-                fill="#555"
-              />
-              <circle 
-                cx={100 + 15 * Math.cos(rad) - 1} 
-                cy={100 + 15 * Math.sin(rad) - 1} 
-                r="2" 
-                fill="#888"
-              />
-            </g>
-          )
-        })}
-        
-        {/* Центральный колпачок с логотипом */}
-        <circle cx="100" cy="100" r="12" fill="#222" />
-        <circle cx="100" cy="100" r="10" stroke="#444" strokeWidth="0.5" fill="none" />
-        <circle cx="97" cy="97" r="4" fill="#3a3a3a" />
-      </g>
+      {/* Шина */}
+      <circle cx="100" cy="100" r="98" fill="#111" />
+      <circle cx="100" cy="100" r="94" fill="#1e1e1e" />
+      
+      {/* Обод */}
+      <circle cx="100" cy="100" r="85" fill="url(#rim3)" />
+      <circle cx="100" cy="100" r="82" stroke="#555" strokeWidth="1" fill="none" />
+      <circle cx="100" cy="100" r="78" fill="#141414" />
+      
+      {/* 6 широких спиц - каждые 60 градусов */}
+      {/* Спица 0° (вправо) */}
+      <polygon points="118,95 175,85 175,115 118,105" fill="url(#spoke3)" />
+      {/* Спица 60° */}
+      <polygon points="109,118 155,160 135,170 104,123" fill="url(#spoke3)" />
+      {/* Спица 120° */}
+      <polygon points="91,118 65,170 45,160 96,123" fill="url(#spoke3)" />
+      {/* Спица 180° (влево) */}
+      <polygon points="82,105 25,115 25,85 82,95" fill="url(#spoke3)" />
+      {/* Спица 240° */}
+      <polygon points="91,82 45,40 65,30 96,77" fill="url(#spoke3)" />
+      {/* Спица 300° */}
+      <polygon points="109,82 135,30 155,40 104,77" fill="url(#spoke3)" />
+      
+      {/* Центр */}
+      <circle cx="100" cy="100" r="26" fill="url(#center3)" />
+      <circle cx="100" cy="100" r="22" stroke="#666" strokeWidth="1.5" fill="none" />
+      
+      {/* 5 болтов с бликами */}
+      <circle cx="100" cy="82" r="5" fill="#444" />
+      <circle cx="117" cy="89" r="5" fill="#444" />
+      <circle cx="111" cy="109" r="5" fill="#444" />
+      <circle cx="89" cy="109" r="5" fill="#444" />
+      <circle cx="83" cy="89" r="5" fill="#444" />
+      
+      <circle cx="99" cy="81" r="2" fill="#777" />
+      <circle cx="116" cy="88" r="2" fill="#777" />
+      <circle cx="110" cy="108" r="2" fill="#777" />
+      <circle cx="88" cy="108" r="2" fill="#777" />
+      <circle cx="82" cy="88" r="2" fill="#777" />
+      
+      {/* Колпачок */}
+      <circle cx="100" cy="100" r="12" fill="#222" />
+      <circle cx="100" cy="100" r="9" stroke="#444" strokeWidth="0.5" fill="none" />
+      <circle cx="97" cy="97" r="4" fill="#333" />
     </svg>
   )
 }
@@ -316,7 +208,6 @@ export function HeroSection() {
     <section className="relative min-h-screen flex flex-col bg-gradient-to-b from-background via-secondary/20 to-background overflow-hidden">
       {/* Декоративный фон */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
-      <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(to_right,transparent_0%,transparent_49%,hsl(var(--border)/0.1)_50%,transparent_51%,transparent_100%)]" />
       
       {/* Контент */}
       <div className="relative flex-1 flex flex-col items-center justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
@@ -341,7 +232,7 @@ export function HeroSection() {
         {/* Диски и кнопка */}
         <div className="flex flex-col items-center w-full max-w-5xl">
           
-          {/* Верхний ряд: 2 диска + кнопка */}
+          {/* Верхний ряд */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 lg:gap-12 mb-6 sm:mb-8">
             
             {/* Диск 1 */}
@@ -349,32 +240,29 @@ export function HeroSection() {
               className={`transition-all duration-1000 ease-out ${
                 visible[0] 
                   ? 'opacity-100 translate-x-0 rotate-0' 
-                  : 'opacity-0 -translate-x-16 -rotate-12'
+                  : 'opacity-0 -translate-x-12 -rotate-12'
               }`}
             >
-              <div className="w-32 h-32 sm:w-40 sm:h-40 lg:w-52 lg:h-52 hover:scale-105 hover:rotate-6 transition-all duration-500 cursor-pointer">
+              <div className="w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 hover:scale-110 transition-transform duration-300 drop-shadow-2xl">
                 <PremiumWheel1 className="w-full h-full" />
               </div>
             </div>
 
-            {/* Кнопка каталога */}
-            <div 
-              className={`transition-all duration-1000 ease-out delay-200 ${
-                visible[1] 
-                  ? 'opacity-100 scale-100' 
-                  : 'opacity-0 scale-75'
-              }`}
-            >
-              <Button 
-                asChild 
-                size="lg" 
-                className="bg-primary text-primary-foreground hover:bg-primary/90 px-10 sm:px-14 py-7 sm:py-8 text-lg sm:text-xl font-bold shadow-2xl shadow-primary/40 hover:shadow-primary/60 hover:scale-110 transition-all duration-300 rounded-full border-2 border-primary-foreground/10"
-              >
-                <Link href="/catalog">
-                  Каталог дисков
-                  <ArrowRight className="ml-3 w-6 h-6" />
-                </Link>
-              </Button>
+            {/* Кнопка */}
+            <div className={`transition-all duration-700 delay-300 ${
+              visible[0] ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+            }`}>
+              <Link href="/catalog">
+                <Button 
+                  size="lg" 
+                  className="group relative px-8 sm:px-10 py-6 sm:py-7 text-base sm:text-lg font-bold rounded-full bg-primary hover:bg-primary/90 shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 hover:scale-105"
+                >
+                  <span className="relative z-10 flex items-center gap-2 sm:gap-3">
+                    Каталог дисков
+                    <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </Button>
+              </Link>
             </div>
 
             {/* Диск 2 */}
@@ -382,50 +270,52 @@ export function HeroSection() {
               className={`transition-all duration-1000 ease-out ${
                 visible[1] 
                   ? 'opacity-100 translate-x-0 rotate-0' 
-                  : 'opacity-0 translate-x-16 rotate-12'
+                  : 'opacity-0 translate-x-12 rotate-12'
               }`}
             >
-              <div className="w-32 h-32 sm:w-40 sm:h-40 lg:w-52 lg:h-52 hover:scale-105 hover:-rotate-6 transition-all duration-500 cursor-pointer">
+              <div className="w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 hover:scale-110 transition-transform duration-300 drop-shadow-2xl">
                 <PremiumWheel2 className="w-full h-full" />
               </div>
             </div>
           </div>
 
-          {/* Диск 3 - снизу по центру */}
+          {/* Диск 3 снизу */}
           <div 
             className={`transition-all duration-1000 ease-out ${
               visible[2] 
-                ? 'opacity-100 translate-y-0 scale-100' 
-                : 'opacity-0 translate-y-12 scale-75'
+                ? 'opacity-100 translate-y-0 rotate-0' 
+                : 'opacity-0 translate-y-12 rotate-6'
             }`}
           >
-            <div className="w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 hover:scale-105 transition-all duration-500 cursor-pointer">
+            <div className="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 hover:scale-110 transition-transform duration-300 drop-shadow-2xl">
               <PremiumWheel3 className="w-full h-full" />
             </div>
           </div>
         </div>
 
         {/* Статистика */}
-        <div className="grid grid-cols-3 gap-10 sm:gap-20 max-w-xl mx-auto mt-12 sm:mt-16">
-          <div className="text-center">
-            <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">500+</p>
-            <p className="text-muted-foreground text-xs sm:text-sm mt-1">Моделей</p>
+        <div className="mt-12 sm:mt-16 grid grid-cols-3 gap-6 sm:gap-10 text-center">
+          <div>
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">500+</div>
+            <div className="text-xs sm:text-sm text-muted-foreground mt-1">Моделей</div>
           </div>
-          <div className="text-center">
-            <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">50+</p>
-            <p className="text-muted-foreground text-xs sm:text-sm mt-1">Брендов</p>
+          <div>
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">50+</div>
+            <div className="text-xs sm:text-sm text-muted-foreground mt-1">Брендов</div>
           </div>
-          <div className="text-center">
-            <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">10K+</p>
-            <p className="text-muted-foreground text-xs sm:text-sm mt-1">Клиентов</p>
+          <div>
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">10K+</div>
+            <div className="text-xs sm:text-sm text-muted-foreground mt-1">Клиентов</div>
           </div>
         </div>
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground/50 animate-bounce">
-        <span className="text-[10px] sm:text-xs tracking-widest uppercase">Прокрутите</span>
-        <ChevronDown className="w-5 h-5" />
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce">
+        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+          <span className="text-xs uppercase tracking-widest">Прокрутите</span>
+          <ChevronDown className="w-5 h-5" />
+        </div>
       </div>
     </section>
   )

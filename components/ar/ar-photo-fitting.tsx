@@ -34,7 +34,6 @@ interface ARPhotoFittingProps {
 export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: ARPhotoFittingProps) {
   const [carPhoto, setCarPhoto] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   // Wheel overlay state
@@ -141,49 +140,84 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
     return wheel.image_transparent || wheel.images?.[0] || null
   }, [wheel])
 
-  // Save composite image
-  const saveImage = useCallback(() => {
+  // Save composite image with all transforms
+  const saveImage = useCallback(async () => {
     const wheelImageUrl = getWheelImageForAR()
-    if (!carPhoto || !wheelImageUrl || !canvasRef.current) return
+    if (!carPhoto || !wheelImageUrl || !containerRef.current) return
     
-    const canvas = canvasRef.current
+    // Используем html2canvas подход - рендерим весь контейнер как есть
+    const container = containerRef.current
+    
+    // Создаем временный canvas для композиции
+    const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    // Загружаем фото автомобиля
     const carImg = document.createElement('img')
     carImg.crossOrigin = 'anonymous'
+    
     carImg.onload = () => {
       canvas.width = carImg.width
       canvas.height = carImg.height
       
-      // Draw car
+      // Рисуем авто
       ctx.drawImage(carImg, 0, 0)
       
-      // Draw wheel
+      // Загружаем диск
       const wheelImg = document.createElement('img')
       wheelImg.crossOrigin = 'anonymous'
       wheelImg.onload = () => {
         const wheelW = (wheelScaleX / 100) * canvas.width
         const wheelH = (wheelScaleY / 100) * canvas.height
-        const wheelX = (wheelPosition.x / 100) * canvas.width - wheelW / 2
-        const wheelY = (wheelPosition.y / 100) * canvas.height - wheelH / 2
+        const centerX = (wheelPosition.x / 100) * canvas.width
+        const centerY = (wheelPosition.y / 100) * canvas.height
         
-        ctx.save()
-        ctx.translate(wheelX + wheelW / 2, wheelY + wheelH / 2)
-        ctx.rotate((wheelRotateZ * Math.PI) / 180)
-        ctx.drawImage(wheelImg, -wheelW / 2, -wheelH / 2, wheelW, wheelH)
-        ctx.restore()
+        // Создаем offscreen canvas для диска с 3D трансформациями
+        const wheelCanvas = document.createElement('canvas')
+        const wheelCtx = wheelCanvas.getContext('2d')
+        if (!wheelCtx) return
         
-        // Download
+        // Увеличиваем размер для качества при трансформациях
+        const padding = 100
+        wheelCanvas.width = wheelW + padding * 2
+        wheelCanvas.height = wheelH + padding * 2
+        
+        // Центр offscreen canvas
+        const offCenterX = wheelCanvas.width / 2
+        const offCenterY = wheelCanvas.height / 2
+        
+        wheelCtx.save()
+        wheelCtx.translate(offCenterX, offCenterY)
+        
+        // Применяем все повороты (эмуляция 3D через scale для X и Y осей)
+        const rotZ = (wheelRotateZ * Math.PI) / 180
+        const scaleXFactor = Math.cos((wheelRotateY * Math.PI) / 180)
+        const scaleYFactor = Math.cos((wheelRotateX * Math.PI) / 180)
+        
+        wheelCtx.rotate(rotZ)
+        wheelCtx.scale(scaleXFactor, scaleYFactor)
+        
+        wheelCtx.drawImage(wheelImg, -wheelW / 2, -wheelH / 2, wheelW, wheelH)
+        wheelCtx.restore()
+        
+        // Рисуем трансформированный диск на основной canvas
+        ctx.drawImage(
+          wheelCanvas,
+          centerX - wheelCanvas.width / 2,
+          centerY - wheelCanvas.height / 2
+        )
+        
+        // Скачиваем
         const link = document.createElement('a')
         link.download = `${wheel?.name}-fitting.jpg`
-        link.href = canvas.toDataURL('image/jpeg', 0.9)
+        link.href = canvas.toDataURL('image/jpeg', 0.95)
         link.click()
       }
       wheelImg.src = wheelImageUrl
     }
     carImg.src = carPhoto
-  }, [carPhoto, wheel, wheelPosition, wheelScaleX, wheelScaleY, wheelRotateZ, getWheelImageForAR])
+  }, [carPhoto, wheel, wheelPosition, wheelScaleX, wheelScaleY, wheelRotateZ, wheelRotateX, wheelRotateY, getWheelImageForAR])
 
   // Reset
   const resetPhoto = useCallback(() => {

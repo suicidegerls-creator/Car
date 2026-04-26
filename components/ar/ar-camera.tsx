@@ -163,7 +163,7 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
     setIsDragging(false)
   }
 
-  // Capture photo
+  // Capture photo with all 3D transforms
   const capturePhoto = () => {
     if (!videoRef.current || !canvasRef.current || !containerRef.current) return
 
@@ -179,28 +179,56 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
     // Draw video frame
     ctx.drawImage(video, 0, 0)
 
-    // Draw wheel overlay
-    if (wheel && wheel.images && wheel.images.length > 0) {
+    // Draw wheel overlay with all transforms
+    const wheelImageUrl = wheel?.image_transparent || wheel?.images?.[0]
+    if (wheel && wheelImageUrl) {
       const img = document.createElement('img')
       img.crossOrigin = 'anonymous'
       img.onload = () => {
-        const wheelWidth = (wheelScaleX / 100) * Math.min(canvas.width, canvas.height)
-        const wheelHeight = (wheelScaleY / 100) * Math.min(canvas.width, canvas.height)
-        const wheelX = (wheelPosition.x / 100) * canvas.width - wheelWidth / 2
-        const wheelY = (wheelPosition.y / 100) * canvas.height - wheelHeight / 2
+        const wheelW = (wheelScaleX / 100) * Math.min(canvas.width, canvas.height)
+        const wheelH = (wheelScaleY / 100) * Math.min(canvas.width, canvas.height)
+        const centerX = (wheelPosition.x / 100) * canvas.width
+        const centerY = (wheelPosition.y / 100) * canvas.height
 
-        ctx.save()
-        ctx.translate(wheelX + wheelWidth / 2, wheelY + wheelHeight / 2)
-        ctx.rotate((wheelRotateZ * Math.PI) / 180)
-        // Note: 3D transforms can't be fully replicated in 2D canvas, but we apply basic rotation
-        ctx.drawImage(img, -wheelWidth / 2, -wheelHeight / 2, wheelWidth, wheelHeight)
-        ctx.restore()
+        // Create offscreen canvas for wheel with 3D transforms
+        const wheelCanvas = document.createElement('canvas')
+        const wheelCtx = wheelCanvas.getContext('2d')
+        if (!wheelCtx) return
+
+        // Add padding for rotations
+        const padding = 50
+        wheelCanvas.width = wheelW + padding * 2
+        wheelCanvas.height = wheelH + padding * 2
+
+        const offCenterX = wheelCanvas.width / 2
+        const offCenterY = wheelCanvas.height / 2
+
+        wheelCtx.save()
+        wheelCtx.translate(offCenterX, offCenterY)
+
+        // Apply all rotations (emulate 3D with scale for X/Y axes)
+        const rotZ = (wheelRotateZ * Math.PI) / 180
+        const scaleXFactor = Math.cos((wheelRotateY * Math.PI) / 180)
+        const scaleYFactor = Math.cos((wheelRotateX * Math.PI) / 180)
+
+        wheelCtx.rotate(rotZ)
+        wheelCtx.scale(scaleXFactor, scaleYFactor)
+
+        wheelCtx.drawImage(img, -wheelW / 2, -wheelH / 2, wheelW, wheelH)
+        wheelCtx.restore()
+
+        // Draw transformed wheel onto main canvas
+        ctx.drawImage(
+          wheelCanvas,
+          centerX - wheelCanvas.width / 2,
+          centerY - wheelCanvas.height / 2
+        )
 
         // Get image data
-        const imageData = canvas.toDataURL('image/jpeg', 0.9)
+        const imageData = canvas.toDataURL('image/jpeg', 0.95)
         setCapturedImage(imageData)
       }
-      img.src = wheel.images[0]
+      img.src = wheelImageUrl
     }
   }
 

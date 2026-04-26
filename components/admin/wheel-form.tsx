@@ -333,7 +333,7 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
         <div className="flex items-center gap-3">
           {imageTransparent ? (
             <div className="relative group">
-              <div className="w-20 h-20 border rounded bg-[url('/checkerboard.png')] bg-repeat bg-[length:10px_10px]">
+              <div className="w-20 h-20 border rounded bg-[linear-gradient(45deg,#ccc_25%,transparent_25%,transparent_75%,#ccc_75%,#ccc),linear-gradient(45deg,#ccc_25%,transparent_25%,transparent_75%,#ccc_75%,#ccc)] bg-[length:8px_8px] bg-[position:0_0,4px_4px]">
                 <img
                   src={imageTransparent}
                   alt="AR изображение"
@@ -810,7 +810,7 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
                           </Select>
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs">Модификация</Label>
+                          <Label className="text-xs">��одификация</Label>
                           <Input
                             value={car.car_modification || ''}
                             onChange={(e) => updateCarCompatibility(index, 'car_modification', e.target.value || undefined)}
