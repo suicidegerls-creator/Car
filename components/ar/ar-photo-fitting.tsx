@@ -191,7 +191,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
       // Загружаем диск
       const wheelImg = document.createElement('img')
       wheelImg.crossOrigin = 'anonymous'
-      wheelImg.onload = () => {
+      wheelImg.onload = async () => {
         // Позиция диска в координатах контейнера
         const wheelCenterXInContainer = (wheelPosition.x / 100) * containerRect.width
         const wheelCenterYInContainer = (wheelPosition.y / 100) * containerRect.height
@@ -401,7 +401,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Camera className="w-5 h-5" />
-                Сделать фото
+                Сделат�� фото
               </Button>
               
               {/* Hidden file input with camera capture */}
