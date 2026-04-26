@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { ARPhotoFitting } from './ar-photo-fitting'
 import { WheelSelector } from './wheel-selector'
@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { 
   Camera, 
   ChevronLeft,
-  Info
+  Info,
+  Loader2
 } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -18,10 +19,10 @@ import type { Wheel } from '@/lib/types/wheel'
 
 type Step = 'intro' | 'select-wheel' | 'fitting'
 
-export function ARFittingRoom() {
+function ARFittingRoomContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const preselectedWheelId = searchParams.get('wheel')
+  const preselectedWheelId = searchParams?.get('wheel') ?? null
   
   const [step, setStep] = useState<Step>(preselectedWheelId ? 'fitting' : 'intro')
   const [selectedWheel, setSelectedWheel] = useState<Wheel | null>(null)
@@ -192,5 +193,18 @@ export function ARFittingRoom() {
       onChangeWheel={() => setStep('select-wheel')}
       onAddToCart={handleAddToCart}
     />
+  )
+}
+
+// Export wrapper with Suspense for useSearchParams
+export function ARFittingRoom() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-[calc(100vh-5rem)]">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    }>
+      <ARFittingRoomContent />
+    </Suspense>
   )
 }

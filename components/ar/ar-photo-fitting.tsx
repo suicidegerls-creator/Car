@@ -589,8 +589,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
         )}
       </div>
 
-      {/* Hidden canvas for compositing */}
-      <canvas ref={canvasRef} className="hidden" />
+      
 
       {/* Processing overlay */}
       {isProcessing && (
