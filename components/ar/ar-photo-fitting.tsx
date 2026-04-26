@@ -145,8 +145,8 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
     const wheelImageUrl = getWheelImageForAR()
     if (!carPhoto || !wheelImageUrl || !containerRef.current) return
     
-    // Используем html2canvas подход - рендерим весь контейнер как есть
     const container = containerRef.current
+    const containerRect = container.getBoundingClientRect()
     
     // Создаем временный canvas для композиции
     const canvas = document.createElement('canvas')
@@ -158,8 +158,32 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
     carImg.crossOrigin = 'anonymous'
     
     carImg.onload = () => {
+      // Определяем как изображение отображается в контейнере (object-contain)
+      const containerAspect = containerRect.width / containerRect.height
+      const imgAspect = carImg.width / carImg.height
+      
+      let displayWidth: number, displayHeight: number, offsetX: number, offsetY: number
+      
+      if (imgAspect > containerAspect) {
+        // Изображение шире - ограничено по ширине
+        displayWidth = containerRect.width
+        displayHeight = containerRect.width / imgAspect
+        offsetX = 0
+        offsetY = (containerRect.height - displayHeight) / 2
+      } else {
+        // Изображение выше - ограничено по высоте
+        displayHeight = containerRect.height
+        displayWidth = containerRect.height * imgAspect
+        offsetX = (containerRect.width - displayWidth) / 2
+        offsetY = 0
+      }
+      
+      // Canvas размером с оригинальное изображение
       canvas.width = carImg.width
       canvas.height = carImg.height
+      
+      // Масштаб между отображением и оригиналом
+      const scaleToOriginal = carImg.width / displayWidth
       
       // Рисуем авто
       ctx.drawImage(carImg, 0, 0)
@@ -168,10 +192,25 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
       const wheelImg = document.createElement('img')
       wheelImg.crossOrigin = 'anonymous'
       wheelImg.onload = () => {
-        const wheelW = (wheelScaleX / 100) * canvas.width
-        const wheelH = (wheelScaleY / 100) * canvas.height
-        const centerX = (wheelPosition.x / 100) * canvas.width
-        const centerY = (wheelPosition.y / 100) * canvas.height
+        // Позиция диска в координатах контейнера
+        const wheelCenterXInContainer = (wheelPosition.x / 100) * containerRect.width
+        const wheelCenterYInContainer = (wheelPosition.y / 100) * containerRect.height
+        
+        // Преобразуем в координаты отображаемого изображения
+        const wheelCenterXInDisplay = wheelCenterXInContainer - offsetX
+        const wheelCenterYInDisplay = wheelCenterYInContainer - offsetY
+        
+        // Преобразуем в координаты оригинального изображения
+        const centerX = wheelCenterXInDisplay * scaleToOriginal
+        const centerY = wheelCenterYInDisplay * scaleToOriginal
+        
+        // Размер диска в координатах контейнера
+        const wheelWInContainer = (wheelScaleX / 100) * containerRect.width
+        const wheelHInContainer = (wheelScaleY / 100) * containerRect.height
+        
+        // Преобразуем в размер на оригинале
+        const wheelW = wheelWInContainer * scaleToOriginal
+        const wheelH = wheelHInContainer * scaleToOriginal
         
         // Создаем offscreen canvas для диска с 3D трансформациями
         const wheelCanvas = document.createElement('canvas')
@@ -179,7 +218,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
         if (!wheelCtx) return
         
         // Увеличиваем размер для качества при трансформациях
-        const padding = 100
+        const padding = Math.max(wheelW, wheelH) * 0.5
         wheelCanvas.width = wheelW + padding * 2
         wheelCanvas.height = wheelH + padding * 2
         
@@ -208,11 +247,60 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
           centerY - wheelCanvas.height / 2
         )
         
-        // Скачиваем
-        const link = document.createElement('a')
-        link.download = `${wheel?.name}-fitting.jpg`
-        link.href = canvas.toDataURL('image/jpeg', 0.95)
-        link.click()
+        // Скачиваем с поддержкой мобильных устройств
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.95)
+        const fileName = `${wheel?.name || 'disk'}-fitting.jpg`
+        
+        // Пробуем Web Share API для мобильных (iOS, Android)
+        if (navigator.share && navigator.canShare) {
+          try {
+            // Конвертируем dataURL в Blob
+            const response = await fetch(dataUrl)
+            const blob = await response.blob()
+            const file = new File([blob], fileName, { type: 'image/jpeg' })
+            
+            if (navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: 'Примерка диска',
+              })
+              return
+            }
+          } catch (shareError) {
+            console.log('Share failed, falling back to download')
+          }
+        }
+        
+        // Fallback: открываем изображение в новой вкладке (работает везде)
+        const newWindow = window.open()
+        if (newWindow) {
+          newWindow.document.write(`
+            <html>
+              <head>
+                <title>${fileName}</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <style>
+                  body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #000; }
+                  img { max-width: 100%; max-height: 100vh; object-fit: contain; }
+                  .hint { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 8px; font-family: system-ui; }
+                </style>
+              </head>
+              <body>
+                <img src="${dataUrl}" alt="Примерка диска" />
+                <div class="hint">Нажмите и удерживайте для сохранения</div>
+              </body>
+            </html>
+          `)
+          newWindow.document.close()
+        } else {
+          // Последний fallback: стандартная загрузка
+          const link = document.createElement('a')
+          link.download = fileName
+          link.href = dataUrl
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        }
       }
       wheelImg.src = wheelImageUrl
     }

@@ -20,122 +20,108 @@ export default function NotFound() {
         <div className="absolute bottom-1/4 -right-20 w-60 h-60 bg-accent/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative z-10 text-center max-w-lg mx-auto">
-        {/* Flat tire wheel illustration */}
-        <div className={`relative w-64 h-64 mx-auto mb-8 transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <svg viewBox="0 0 200 200" className="w-full h-full">
-            <defs>
-              {/* Gradients */}
-              <linearGradient id="rimGradient404" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="hsl(var(--primary))" />
-                <stop offset="50%" stopColor="hsl(var(--primary) / 0.8)" />
-                <stop offset="100%" stopColor="hsl(var(--primary) / 0.6)" />
-              </linearGradient>
-              <linearGradient id="tireGradient404" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#2a2a2a" />
-                <stop offset="100%" stopColor="#1a1a1a" />
-              </linearGradient>
-              <linearGradient id="hubGradient404" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#888" />
-                <stop offset="50%" stopColor="#666" />
-                <stop offset="100%" stopColor="#444" />
-              </linearGradient>
-              {/* Shadow filter */}
-              <filter id="shadow404" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="0" dy="4" stdDeviation="8" floodOpacity="0.3" />
-              </filter>
-            </defs>
-
-            {/* Shadow on ground */}
-            <ellipse cx="100" cy="185" rx="70" ry="10" fill="hsl(var(--foreground) / 0.1)" />
-
-            {/* Flat tire - deformed ellipse at bottom */}
-            <g filter="url(#shadow404)">
-              {/* Outer tire - flat at bottom */}
-              <path 
-                d="M 30 100 
-                   C 30 55, 55 25, 100 25 
-                   C 145 25, 170 55, 170 100 
-                   C 170 140, 150 165, 100 170
-                   C 50 165, 30 140, 30 100"
-                fill="url(#tireGradient404)"
-              />
-              
-              {/* Tire tread pattern */}
-              <path 
-                d="M 35 100 
-                   C 35 60, 57 32, 100 32 
-                   C 143 32, 165 60, 165 100 
-                   C 165 135, 147 158, 100 163
-                   C 53 158, 35 135, 35 100"
-                fill="none"
-                stroke="#333"
-                strokeWidth="2"
-                strokeDasharray="8 4"
-              />
-
-              {/* Rim */}
-              <ellipse cx="100" cy="100" rx="55" ry="55" fill="url(#rimGradient404)" />
-              
-              {/* Inner rim detail */}
-              <ellipse cx="100" cy="100" rx="48" ry="48" fill="none" stroke="hsl(var(--primary) / 0.4)" strokeWidth="2" />
-
-              {/* Spokes */}
-              {[0, 60, 120, 180, 240, 300].map((angle, i) => {
-                const rad = (angle * Math.PI) / 180
-                const x1 = 100 + 20 * Math.cos(rad)
-                const y1 = 100 + 20 * Math.sin(rad)
-                const x2 = 100 + 45 * Math.cos(rad)
-                const y2 = 100 + 45 * Math.sin(rad)
-                return (
-                  <line
-                    key={i}
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
-                    stroke="hsl(var(--primary) / 0.6)"
-                    strokeWidth="8"
-                    strokeLinecap="round"
-                  />
-                )
-              })}
-
-              {/* Center hub */}
-              <circle cx="100" cy="100" r="22" fill="url(#hubGradient404)" />
-              <circle cx="100" cy="100" r="18" fill="none" stroke="#555" strokeWidth="1" />
-              
-              {/* Center cap */}
-              <circle cx="100" cy="100" r="12" fill="#444" />
-              <circle cx="100" cy="100" r="8" fill="#333" />
-              
-              {/* Lug nuts */}
-              {[0, 72, 144, 216, 288].map((angle, i) => {
-                const rad = (angle * Math.PI) / 180
-                const x = 100 + 15 * Math.cos(rad)
-                const y = 100 + 15 * Math.sin(rad)
-                return <circle key={i} cx={x} cy={y} r="3" fill="#555" />
-              })}
-
-              {/* Air escaping animation */}
-              <g className="animate-pulse">
-                <circle cx="45" cy="145" r="3" fill="hsl(var(--muted-foreground) / 0.4)" />
-                <circle cx="38" cy="150" r="2" fill="hsl(var(--muted-foreground) / 0.3)" />
-                <circle cx="50" cy="152" r="2.5" fill="hsl(var(--muted-foreground) / 0.3)" />
-              </g>
-            </g>
-          </svg>
+      <div className="relative z-10 text-center max-w-2xl mx-auto">
+        
+        {/* 4 - Wheel - 4 composition */}
+        <div className={`flex items-center justify-center gap-2 sm:gap-4 mb-8 transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           
-          {/* Sad expression overlay */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl opacity-0">
-            
-          </div>
-        </div>
+          {/* Left "4" */}
+          <span className="text-[80px] sm:text-[120px] md:text-[160px] font-black text-foreground leading-none select-none drop-shadow-lg" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+            4
+          </span>
+          
+          {/* Flat tire wheel as "0" */}
+          <div className="relative w-24 h-24 sm:w-36 sm:h-36 md:w-44 md:h-44 flex-shrink-0">
+            <svg viewBox="0 0 200 200" className="w-full h-full">
+              <defs>
+                {/* Gradients */}
+                <linearGradient id="rimGradient404" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#444" />
+                  <stop offset="50%" stopColor="#333" />
+                  <stop offset="100%" stopColor="#222" />
+                </linearGradient>
+                <linearGradient id="tireGradient404" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#2a2a2a" />
+                  <stop offset="100%" stopColor="#1a1a1a" />
+                </linearGradient>
+                <linearGradient id="hubGradient404" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#666" />
+                  <stop offset="50%" stopColor="#444" />
+                  <stop offset="100%" stopColor="#333" />
+                </linearGradient>
+                {/* Shadow filter */}
+                <filter id="shadow404" x="-50%" y="-50%" width="200%" height="200%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.4" />
+                </filter>
+              </defs>
 
-        {/* 404 text */}
-        <h1 className={`text-8xl md:text-9xl font-bold text-primary/20 mb-2 transition-all duration-700 delay-300 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
-          404
-        </h1>
+              <g filter="url(#shadow404)">
+                {/* Outer tire - flat at bottom */}
+                <path 
+                  d="M 25 100 
+                     C 25 50, 50 20, 100 20 
+                     C 150 20, 175 50, 175 100 
+                     C 175 145, 155 172, 100 178
+                     C 45 172, 25 145, 25 100"
+                  fill="url(#tireGradient404)"
+                />
+                
+                {/* Tire tread pattern */}
+                <path 
+                  d="M 32 100 
+                     C 32 55, 55 28, 100 28 
+                     C 145 28, 168 55, 168 100 
+                     C 168 140, 150 165, 100 170
+                     C 50 165, 32 140, 32 100"
+                  fill="none"
+                  stroke="#333"
+                  strokeWidth="2"
+                  strokeDasharray="10 5"
+                />
+
+                {/* Rim */}
+                <ellipse cx="100" cy="100" rx="58" ry="58" fill="url(#rimGradient404)" />
+                
+                {/* Inner rim detail */}
+                <ellipse cx="100" cy="100" rx="50" ry="50" fill="none" stroke="#555" strokeWidth="2" />
+
+                {/* Spokes - 5 spoke design */}
+                <path d="M100 100 L100 50 L85 55 L100 100 L115 55 L100 50" fill="#555" />
+                <path d="M100 100 L147 77 L140 63 L100 100 L152 90 L147 77" fill="#555" />
+                <path d="M100 100 L135 140 L148 130 L100 100 L140 150 L135 140" fill="#555" />
+                <path d="M100 100 L65 140 L52 130 L100 100 L60 150 L65 140" fill="#555" />
+                <path d="M100 100 L53 77 L60 63 L100 100 L48 90 L53 77" fill="#555" />
+
+                {/* Center hub */}
+                <circle cx="100" cy="100" r="24" fill="url(#hubGradient404)" />
+                <circle cx="100" cy="100" r="20" fill="none" stroke="#555" strokeWidth="1" />
+                
+                {/* Center cap */}
+                <circle cx="100" cy="100" r="14" fill="#3a3a3a" />
+                <circle cx="100" cy="100" r="10" fill="#2a2a2a" />
+                
+                {/* Lug nuts */}
+                <circle cx="100" cy="84" r="3" fill="#555" />
+                <circle cx="115" cy="95" r="3" fill="#555" />
+                <circle cx="110" cy="112" r="3" fill="#555" />
+                <circle cx="90" cy="112" r="3" fill="#555" />
+                <circle cx="85" cy="95" r="3" fill="#555" />
+
+                {/* Air escaping animation */}
+                <g className="animate-pulse">
+                  <circle cx="42" cy="155" r="4" fill="hsl(var(--muted-foreground) / 0.4)" />
+                  <circle cx="32" cy="162" r="3" fill="hsl(var(--muted-foreground) / 0.3)" />
+                  <circle cx="50" cy="165" r="3" fill="hsl(var(--muted-foreground) / 0.3)" />
+                </g>
+              </g>
+            </svg>
+          </div>
+          
+          {/* Right "4" */}
+          <span className="text-[80px] sm:text-[120px] md:text-[160px] font-black text-foreground leading-none select-none drop-shadow-lg" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+            4
+          </span>
+        </div>
 
         {/* Title */}
         <h2 className={`text-2xl md:text-3xl font-bold text-foreground mb-3 transition-all duration-700 delay-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
