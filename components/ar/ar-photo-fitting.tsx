@@ -140,7 +140,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
     return wheel.image_transparent || wheel.images?.[0] || null
   }, [wheel])
 
-  // Save composite image with all transforms
+// Save composite image by manual canvas rendering
   const saveImage = useCallback(async () => {
     const wheelImageUrl = getWheelImageForAR()
     if (!carPhoto || !wheelImageUrl || !containerRef.current) return
@@ -148,164 +148,135 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
     const container = containerRef.current
     const containerRect = container.getBoundingClientRect()
     
-    // Создаем временный canvas для композиции
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    // Загружаем фото автомобиля
-    const carImg = document.createElement('img')
-    carImg.crossOrigin = 'anonymous'
+    // Загружаем оба изображения
+    const loadImage = (src: string): Promise<HTMLImageElement> => {
+      return new Promise((resolve, reject) => {
+        const img = document.createElement('img')
+        img.crossOrigin = 'anonymous'
+        img.onload = () => resolve(img)
+        img.onerror = reject
+        img.src = src
+      })
+    }
     
-    carImg.onload = () => {
-      // Определяем как изображение отображается в контейнере (object-contain)
-      const containerAspect = containerRect.width / containerRect.height
-      const imgAspect = carImg.width / carImg.height
+    try {
+      const [carImg, wheelImg] = await Promise.all([
+        loadImage(carPhoto),
+        loadImage(wheelImageUrl)
+      ])
       
-      let displayWidth: number, displayHeight: number, offsetX: number, offsetY: number
+      // Создаём canvas размером с контейнер (как на экране)
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+      
+      // Используем размер контейнера для точного соответствия
+      const scale = 2 // Для качества
+      canvas.width = containerRect.width * scale
+      canvas.height = containerRect.height * scale
+      ctx.scale(scale, scale)
+      
+      // Заливаем черным фоном
+      ctx.fillStyle = '#000000'
+      ctx.fillRect(0, 0, containerRect.width, containerRect.height)
+      
+      // Рассчитываем как изображение авто отображается с object-contain
+      const imgAspect = carImg.width / carImg.height
+      const containerAspect = containerRect.width / containerRect.height
+      
+      let drawWidth: number, drawHeight: number, drawX: number, drawY: number
       
       if (imgAspect > containerAspect) {
-        // Изображение шире - ограничено по ширине
-        displayWidth = containerRect.width
-        displayHeight = containerRect.width / imgAspect
-        offsetX = 0
-        offsetY = (containerRect.height - displayHeight) / 2
+        drawWidth = containerRect.width
+        drawHeight = containerRect.width / imgAspect
+        drawX = 0
+        drawY = (containerRect.height - drawHeight) / 2
       } else {
-        // Изображение выше - ограничено по высоте
-        displayHeight = containerRect.height
-        displayWidth = containerRect.height * imgAspect
-        offsetX = (containerRect.width - displayWidth) / 2
-        offsetY = 0
+        drawHeight = containerRect.height
+        drawWidth = containerRect.height * imgAspect
+        drawX = (containerRect.width - drawWidth) / 2
+        drawY = 0
       }
-      
-      // Canvas размером с оригинальное изображение
-      canvas.width = carImg.width
-      canvas.height = carImg.height
-      
-      // Масштаб между отображением и оригиналом
-      const scaleToOriginal = carImg.width / displayWidth
       
       // Рисуем авто
-      ctx.drawImage(carImg, 0, 0)
+      ctx.drawImage(carImg, drawX, drawY, drawWidth, drawHeight)
       
-      // Загружаем диск
-      const wheelImg = document.createElement('img')
-      wheelImg.crossOrigin = 'anonymous'
-      wheelImg.onload = async () => {
-        // Позиция диска в координатах контейнера
-        const wheelCenterXInContainer = (wheelPosition.x / 100) * containerRect.width
-        const wheelCenterYInContainer = (wheelPosition.y / 100) * containerRect.height
-        
-        // Преобразуем в координаты отображаемого изображения
-        const wheelCenterXInDisplay = wheelCenterXInContainer - offsetX
-        const wheelCenterYInDisplay = wheelCenterYInContainer - offsetY
-        
-        // Преобразуем в координаты оригинального изображения
-        const centerX = wheelCenterXInDisplay * scaleToOriginal
-        const centerY = wheelCenterYInDisplay * scaleToOriginal
-        
-        // Размер диска в координатах контейнера
-        const wheelWInContainer = (wheelScaleX / 100) * containerRect.width
-        const wheelHInContainer = (wheelScaleY / 100) * containerRect.height
-        
-        // Преобразуем в размер на оригинале
-        const wheelW = wheelWInContainer * scaleToOriginal
-        const wheelH = wheelHInContainer * scaleToOriginal
-        
-        // Создаем offscreen canvas для диска с 3D трансформациями
-        const wheelCanvas = document.createElement('canvas')
-        const wheelCtx = wheelCanvas.getContext('2d')
-        if (!wheelCtx) return
-        
-        // Увеличиваем размер для качества при трансформациях
-        const padding = Math.max(wheelW, wheelH) * 0.5
-        wheelCanvas.width = wheelW + padding * 2
-        wheelCanvas.height = wheelH + padding * 2
-        
-        // Центр offscreen canvas
-        const offCenterX = wheelCanvas.width / 2
-        const offCenterY = wheelCanvas.height / 2
-        
-        wheelCtx.save()
-        wheelCtx.translate(offCenterX, offCenterY)
-        
-        // Применяем все повороты (эмуляция 3D через scale для X и Y осей)
-        const rotZ = (wheelRotateZ * Math.PI) / 180
-        const scaleXFactor = Math.cos((wheelRotateY * Math.PI) / 180)
-        const scaleYFactor = Math.cos((wheelRotateX * Math.PI) / 180)
-        
-        wheelCtx.rotate(rotZ)
-        wheelCtx.scale(scaleXFactor, scaleYFactor)
-        
-        wheelCtx.drawImage(wheelImg, -wheelW / 2, -wheelH / 2, wheelW, wheelH)
-        wheelCtx.restore()
-        
-        // Рисуем трансформированный диск на основной canvas
-        ctx.drawImage(
-          wheelCanvas,
-          centerX - wheelCanvas.width / 2,
-          centerY - wheelCanvas.height / 2
-        )
-        
-        // Скачиваем с поддержкой мобильных устройств
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.95)
-        const fileName = `${wheel?.name || 'disk'}-fitting.jpg`
-        
-        // Пробуем Web Share API для мобильных (iOS, Android)
-        if (navigator.share && navigator.canShare) {
-          try {
-            // Конвертируем dataURL в Blob
-            const response = await fetch(dataUrl)
-            const blob = await response.blob()
-            const file = new File([blob], fileName, { type: 'image/jpeg' })
-            
-            if (navigator.canShare({ files: [file] })) {
-              await navigator.share({
-                files: [file],
-                title: 'Примерка диска',
-              })
-              return
-            }
-          } catch (shareError) {
-            console.log('Share failed, falling back to download')
-          }
-        }
-        
-        // Fallback: открываем изображение в новой вкладке (работает везде)
-        const newWindow = window.open()
-        if (newWindow) {
-          newWindow.document.write(`
-            <html>
-              <head>
-                <title>${fileName}</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-                <style>
-                  body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #000; }
-                  img { max-width: 100%; max-height: 100vh; object-fit: contain; }
-                  .hint { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 8px; font-family: system-ui; }
-                </style>
-              </head>
-              <body>
-                <img src="${dataUrl}" alt="Примерка диска" />
-                <div class="hint">Нажмите и удерживайте для сохранения</div>
-              </body>
-            </html>
-          `)
-          newWindow.document.close()
-        } else {
-          // Последний fallback: стандартная загрузка
-          const link = document.createElement('a')
-          link.download = fileName
-          link.href = dataUrl
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-        }
+// Рассчитываем позицию и размер контейнера диска (в пикселях)
+      const wheelCenterX = (wheelPosition.x / 100) * containerRect.width
+      const wheelCenterY = (wheelPosition.y / 100) * containerRect.height
+      const wheelContainerW = (wheelScaleX / 100) * containerRect.width
+      const wheelContainerH = (wheelScaleY / 100) * containerRect.height
+      
+      // Применяем object-contain для диска (сохраняем пропорции)
+      const wheelImgAspect = wheelImg.width / wheelImg.height
+      const wheelContainerAspect = wheelContainerW / wheelContainerH
+      
+      let wheelW: number, wheelH: number
+      if (wheelImgAspect > wheelContainerAspect) {
+        // Диск шире - ограничен по ширине
+        wheelW = wheelContainerW
+        wheelH = wheelContainerW / wheelImgAspect
+      } else {
+        // Диск выше - ограничен по высоте
+        wheelH = wheelContainerH
+        wheelW = wheelContainerH * wheelImgAspect
       }
-      wheelImg.src = wheelImageUrl
+      
+      // Рисуем диск с трансформациями
+      ctx.save()
+      ctx.translate(wheelCenterX, wheelCenterY)
+      
+      // Применяем 3D трансформации (эмуляция через scale)
+      const rotZ = (wheelRotateZ * Math.PI) / 180
+      const scaleXFactor = Math.cos((wheelRotateY * Math.PI) / 180)
+      const scaleYFactor = Math.cos((wheelRotateX * Math.PI) / 180)
+      
+      ctx.rotate(rotZ)
+      ctx.scale(scaleXFactor, scaleYFactor)
+      
+      ctx.drawImage(wheelImg, -wheelW / 2, -wheelH / 2, wheelW, wheelH)
+      ctx.restore()
+      
+      // Создаём Blob и скачиваем
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.95)
+      const fileName = `${wheel?.name || 'disk'}-fitting.jpg`
+      
+      // Конвертируем в Blob
+      const byteString = atob(dataUrl.split(',')[1])
+      const ab = new ArrayBuffer(byteString.length)
+      const ia = new Uint8Array(ab)
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i)
+      }
+      const blob = new Blob([ab], { type: 'image/jpeg' })
+      const blobUrl = URL.createObjectURL(blob)
+      
+      // Пробуем Web Share API
+      if (navigator.share && navigator.canShare) {
+        try {
+          const file = new File([blob], fileName, { type: 'image/jpeg' })
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: 'Примерка диска' })
+            URL.revokeObjectURL(blobUrl)
+            return
+          }
+        } catch { /* fallback to download */ }
+      }
+      
+      // Скачиваем
+      const link = document.createElement('a')
+      link.download = fileName
+      link.href = blobUrl
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000)
+      
+    } catch (error) {
+      console.error('Save failed:', error)
+      alert('Не удалось сохранить изображение. Попробуйте ещё раз.')
     }
-    carImg.src = carPhoto
-  }, [carPhoto, wheel, wheelPosition, wheelScaleX, wheelScaleY, wheelRotateZ, wheelRotateX, wheelRotateY, getWheelImageForAR])
+  }, [carPhoto, wheel, wheelPosition, wheelScaleX, wheelScaleY, wheelRotateX, wheelRotateY, wheelRotateZ, getWheelImageForAR])
 
   // Reset
   const resetPhoto = useCallback(() => {
@@ -389,7 +360,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
             <div className="text-center space-y-2">
               <h2 className="text-xl font-bold">Сфотографируйте автомобиль</h2>
               <p className="text-muted-foreground max-w-xs">
-                Сделайте фото сбоку, чтобы было видно колесо. Затем вы сможете примерить на него диск.
+                Сделайте фото сбоку, чтобы было ��идно колесо. Затем вы сможете примерить на него диск.
               </p>
             </div>
 
@@ -401,7 +372,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Camera className="w-5 h-5" />
-                Сделат�� фото
+                Сде��ат�� фото
               </Button>
               
               {/* Hidden file input with camera capture */}
@@ -479,7 +450,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
               )}
               
               {/* Hint */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white text-sm px-3 py-1.5 rounded-full">
+              <div className="hint-overlay absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white text-sm px-3 py-1.5 rounded-full">
                 Перетащите диск на колесо
               </div>
 
@@ -487,7 +458,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
               <Button
                 variant="secondary"
                 size="icon"
-                className="absolute top-4 right-4"
+                className="hint-overlay absolute top-4 right-4"
                 onClick={resetPhoto}
               >
                 <X className="w-5 h-5" />
