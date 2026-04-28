@@ -360,7 +360,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
             <div className="text-center space-y-2">
               <h2 className="text-xl font-bold">Сфотографируйте автомобиль</h2>
               <p className="text-muted-foreground max-w-xs">
-                Сделайте фото сбоку, чтобы было ��идно колесо. Затем вы сможете примерить на него диск.
+                Сделайте фото сбоку, чтобы было видно колесо. Затем вы сможете примерить на него диск.
               </p>
             </div>
 
@@ -372,7 +372,7 @@ export function ARPhotoFitting({ wheel, onBack, onChangeWheel, onAddToCart }: AR
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Camera className="w-5 h-5" />
-                Сде��ат�� фото
+                Сделать фото
               </Button>
               
               {/* Hidden file input with camera capture */}

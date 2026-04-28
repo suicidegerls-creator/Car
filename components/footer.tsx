@@ -111,10 +111,10 @@ export function Footer() {
             © 2026 ДискиБел. Все права защищены.
           </p>
           <div className="flex items-center gap-6 text-muted-foreground text-sm">
-            <Link href="#" className="hover:text-foreground transition-colors">
+            <Link href="/privacy" className="hover:text-foreground transition-colors">
               Политика конфиденциальности
             </Link>
-            <Link href="#" className="hover:text-foreground transition-colors">
+            <Link href="/terms" className="hover:text-foreground transition-colors">
               Условия использования
             </Link>
           </div>

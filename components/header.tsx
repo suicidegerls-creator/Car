@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Menu, X, Search, User, LogIn } from "lucide-react"
+import { Menu, X, Search, User, LogIn, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { CartSheet } from "@/components/cart/cart-sheet"
@@ -90,6 +90,11 @@ export function Header() {
             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
               <Search className="w-5 h-5" />
             </Button>
+            <Link href="/favorites">
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                <Heart className="w-5 h-5" />
+              </Button>
+            </Link>
             {user ? (
               <Link href="/account">
                 <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
@@ -109,7 +114,11 @@ export function Header() {
 
           {/* Mobile Actions */}
           <div className="md:hidden flex items-center gap-1">
-            <CartSheet />
+            <Link href="/favorites">
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                <Heart className="w-5 h-5" />
+              </Button>
+            </Link>
             <button
               className="p-2 text-foreground"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -154,6 +163,12 @@ export function Header() {
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
                 <Search className="w-5 h-5" />
               </Button>
+              <Link href="/favorites" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                  <Heart className="w-5 h-5" />
+                </Button>
+              </Link>
+              <CartSheet />
               {user ? (
                 <Link href="/account" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
