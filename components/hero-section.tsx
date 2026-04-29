@@ -83,7 +83,7 @@ export function HeroSection() {
                   className="group relative px-8 sm:px-10 py-6 sm:py-7 text-base sm:text-lg font-bold rounded-full bg-primary hover:bg-primary/90 shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 hover:scale-105"
                 >
                   <span className="relative z-10 flex items-center gap-2 sm:gap-3">
-                    Каталог дисков
+                    Каталог
                     <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
                   </span>
                 </Button>
@@ -119,7 +119,7 @@ export function HeroSection() {
                 className="group relative px-8 py-6 text-base font-bold rounded-full bg-primary hover:bg-primary/90 shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 hover:scale-105"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  Каталог дисков
+                  Каталог
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Button>

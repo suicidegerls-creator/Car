@@ -119,6 +119,13 @@ export function Footer() {
             </Link>
           </div>
         </div>
+
+        {/* Disclaimer */}
+        <div className="mt-6 text-center">
+          <p className="text-xs text-muted-foreground">
+            Не является публичной офертой, носит информационный характер
+          </p>
+        </div>
       </div>
     </footer>
   )
