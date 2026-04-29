@@ -80,22 +80,13 @@ export default function SensorsPage() {
             <div className="relative">
               <Card className="overflow-hidden border-2 hover:border-blue-500/30 transition-colors">
                 <CardContent className="p-0">
-                  <div className="relative p-8 flex items-center justify-center min-h-[300px] overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
-                    {/* Декоративные элементы */}
-                    <div className="absolute inset-0">
-                      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-500/20 via-transparent to-transparent"></div>
-                      <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-cyan-500/10 via-transparent to-transparent"></div>
-                      {/* Сетка */}
-                      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-                    </div>
+                  <div className="relative p-8 flex items-center justify-center min-h-[300px] overflow-hidden bg-gradient-to-br from-slate-100 via-blue-50 to-white">
                     <div className="relative w-48 h-48 md:w-64 md:h-64">
-                      <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-3xl animate-pulse"></div>
-                      <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-full blur-2xl"></div>
                       <Image
-                        src="/images/sensor.png"
+                        src="/images/sensor.jpg"
                         alt="Датчик давления шин TPMS"
                         fill
-                        className="object-contain relative z-10 drop-shadow-2xl"
+                        className="object-contain drop-shadow-lg"
                       />
                     </div>
                   </div>

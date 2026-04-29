@@ -29,7 +29,7 @@ const categories = [
     description: 'Качественные датчики TPMS для контроля давления в шинах вашего автомобиля',
     icon: Gauge,
     href: '/catalog/sensors',
-    image: '/images/sensor.png',
+    image: '/images/sensor.jpg',
     accent: 'bg-blue-500/10 text-blue-600',
     featured: false,
   },
@@ -69,14 +69,20 @@ export default function CatalogPage() {
                 <Card className="h-full overflow-hidden border-2 border-transparent hover:border-primary/20 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                   <CardContent className="p-0">
                     {/* Image/Icon Area */}
-                    <div className={`relative h-48 ${category.accent} flex items-center justify-center overflow-hidden`}>
+                    <div className={`relative h-48 flex items-center justify-center overflow-hidden ${
+                      category.id === 'sensors' 
+                        ? 'bg-gradient-to-br from-slate-100 via-blue-50 to-slate-100' 
+                        : category.id === 'wheels'
+                        ? 'bg-gradient-to-br from-orange-50 to-amber-100'
+                        : category.accent
+                    }`}>
                       {category.image ? (
                         <div className="relative w-32 h-32 group-hover:scale-110 transition-transform duration-500">
                           <Image
                             src={category.image}
                             alt={category.title}
                             fill
-                            className="object-contain"
+                            className="object-contain drop-shadow-lg"
                           />
                         </div>
                       ) : (
