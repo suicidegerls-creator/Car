@@ -134,8 +134,8 @@ export default function CatalogPage() {
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                  <Link href="tel:+375291234567">
-                    +375 (29) 123-45-67
+                  <Link href="tel:+375296576960">
+                    +375 (29) 657-69-60
                   </Link>
                 </Button>
               </div>
