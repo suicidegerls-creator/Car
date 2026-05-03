@@ -29,51 +29,47 @@ export function HeroSection() {
       {/* Основной контент */}
       <div className="relative flex-1 flex flex-col w-full px-6 sm:px-8 md:px-12 lg:px-16 pt-24 md:pt-28 pb-20">
         
-        {/* ДЕСКТОП ВЕРСИЯ */}
-        <div className="hidden md:flex flex-col flex-1">
+        {/* ДЕСКТОП ВЕРСИЯ - Полноэкранная машина */}
+        <div className="hidden md:block absolute inset-0">
           
-          {/* Текст сверху по центру */}
-          <div className={`z-10 text-center transition-all duration-1000 ease-out ${
-            isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          {/* Машина как фон на весь экран */}
+          <div className={`absolute inset-0 transition-all duration-1000 ease-out delay-300 ${
+            isContentVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
           }`}>
-            <p className="text-muted-foreground text-xs sm:text-sm tracking-[0.35em] uppercase mb-4 font-medium">
-              Премиальные диски в Минске
-            </p>
-            
-            <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] mb-4">
-              <span className="text-foreground">Совершенство</span>
-              <br />
-              <span className="text-primary">в деталях</span>
-            </h1>
-            
-            <p className="text-muted-foreground text-base lg:text-lg max-w-2xl mx-auto leading-relaxed">
-              Откройте коллекцию эксклюзивных литых и кованых дисков от ведущих мировых производителей. Бесплатная примерка на ваш автомобиль.
-            </p>
+            <Image
+              src="https://ibnoxxcnwq9eia7i.public.blob.vercel-storage.com/images/1000066017.png"
+              alt="Спортивный автомобиль с премиальными литыми дисками"
+              fill
+              className="object-cover object-right mix-blend-screen"
+              priority
+              sizes="100vw"
+            />
           </div>
-
-          {/* Контейнер с машиной на всю ширину и кнопками поверх */}
-          <div className="flex-1 relative mt-6">
-            
-            {/* Машина на весь контейнер - абсолютное позиционирование на всю секцию */}
-            <div className={`absolute inset-0 -left-16 -right-16 lg:-left-24 lg:-right-24 xl:-left-32 xl:-right-32 transition-all duration-1000 ease-out delay-300 ${
-              isContentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
+          
+          {/* Градиент слева для читаемости текста */}
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent w-[60%]" />
+          
+          {/* Контент слева */}
+          <div className="absolute inset-0 flex items-center">
+            <div className={`max-w-xl ml-8 lg:ml-16 xl:ml-24 transition-all duration-1000 ease-out ${
+              isContentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
             }`}>
-              <Image
-                src="https://ibnoxxcnwq9eia7i.public.blob.vercel-storage.com/images/1000066017.png"
-                alt="Спортивный автомобиль с премиальными литыми дисками"
-                fill
-                className="object-contain object-bottom mix-blend-screen"
-                priority
-                sizes="100vw"
-              />
-            </div>
-            
-            {/* Кнопки и статистика поверх машины - внизу слева */}
-            <div className={`absolute bottom-8 left-0 z-10 transition-all duration-1000 ease-out delay-200 ${
-              isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}>
+              <p className="text-muted-foreground text-xs sm:text-sm tracking-[0.35em] uppercase mb-4 font-medium">
+                Премиальные диски в Минске
+              </p>
+              
+              <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] mb-6">
+                <span className="text-foreground">Совершенство</span>
+                <br />
+                <span className="text-primary">в деталях</span>
+              </h1>
+              
+              <p className="text-muted-foreground text-base lg:text-lg leading-relaxed mb-8">
+                Откройте коллекцию эксклюзивных литых и кованых дисков от ведущих мировых производителей. Бесплатная примерка на ваш автомобиль.
+              </p>
+              
               {/* Кнопки */}
-              <div className="flex flex-row gap-4 mb-6">
+              <div className="flex flex-row gap-4 mb-10">
                 <Link href="/catalog">
                   <Button 
                     size="lg" 
@@ -89,7 +85,7 @@ export function HeroSection() {
                   <Button 
                     size="lg" 
                     variant="outline"
-                    className="px-8 py-7 text-base font-semibold rounded-full border-2 bg-background/80 backdrop-blur-sm hover:bg-secondary transition-all duration-300"
+                    className="px-8 py-7 text-base font-semibold rounded-full border-2 bg-background/60 backdrop-blur-sm hover:bg-secondary transition-all duration-300"
                   >
                     Примерка дисков
                   </Button>
@@ -97,7 +93,7 @@ export function HeroSection() {
               </div>
 
               {/* Статистика */}
-              <div className="grid grid-cols-3 gap-8">
+              <div className="grid grid-cols-3 gap-10">
                 <div>
                   <div className="text-3xl lg:text-4xl font-bold text-foreground">500+</div>
                   <div className="text-sm text-muted-foreground mt-1">Моделей дисков</div>
@@ -114,6 +110,9 @@ export function HeroSection() {
             </div>
           </div>
         </div>
+        
+        {/* Пустой контейнер для сохранения высоты на десктопе */}
+        <div className="hidden md:block flex-1" />
 
         {/* МОБИЛЬНАЯ ВЕРСИЯ */}
         <div className="flex md:hidden flex-col">
