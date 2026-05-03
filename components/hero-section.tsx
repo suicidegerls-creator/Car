@@ -116,7 +116,7 @@ export function HeroSection() {
                 src="https://ibnoxxcnwq9eia7i.public.blob.vercel-storage.com/images/1000066017.png"
                 alt="Спортивный автомобиль с премиальными литыми дисками"
                 fill
-                className="object-cover object-center lg:object-contain lg:object-right mix-blend-screen"
+                className="object-cover object-center lg:object-contain lg:object-right mix-blend-screen lg:mix-blend-normal"
                 priority
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
