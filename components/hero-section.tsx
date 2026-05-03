@@ -26,105 +26,135 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-gradient-to-br from-background via-secondary/30 to-background" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
       
-      {/* Изображение автомобиля - на весь экран справа (только десктоп) */}
-      <div className={`hidden md:block absolute top-1/2 -translate-y-1/2 right-0 w-[55%] h-[90%] transition-all duration-1000 ease-out delay-300 ${
-        isContentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
-      }`}>
-        {/* Градиентные маски */}
-        <div className="absolute inset-0 z-10 pointer-events-none">
-          <div className="absolute top-0 bottom-0 left-0 w-64 bg-gradient-to-r from-background to-transparent" />
-          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-background to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
-        </div>
-        <Image
-          src="https://ibnoxxcnwq9eia7i.public.blob.vercel-storage.com/images/1000066017.png"
-          alt="Спортивный автомобиль с премиальными литыми дисками"
-          fill
-          className="object-cover object-center mix-blend-screen scale-125"
-          priority
-          sizes="60vw"
-        />
-      </div>
-      
       {/* Основной контент */}
-      <div className="relative flex-1 flex flex-col max-w-7xl mx-auto px-4 sm:px-6 md:px-8 pt-24 md:pt-32 pb-20">
+      <div className="relative flex-1 flex flex-col w-full px-6 sm:px-8 md:px-12 lg:px-16 pt-24 md:pt-28 pb-20">
         
-        {/* Контейнер: текст слева, картинка справа */}
-        <div className="flex flex-col md:flex-row md:items-center md:gap-8 flex-1">
+        {/* ДЕСКТОП ВЕРСИЯ */}
+        <div className="hidden md:flex flex-col flex-1">
           
-          {/* Левая часть - текст */}
-          <div className={`flex-1 md:max-w-xl text-center md:text-left z-10 transition-all duration-1000 ease-out ${
+          {/* Текст сверху */}
+          <div className={`z-10 transition-all duration-1000 ease-out ${
             isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}>
-            <p className="text-muted-foreground text-xs sm:text-sm tracking-[0.35em] uppercase mb-4 sm:mb-6 font-medium">
+            <p className="text-muted-foreground text-xs sm:text-sm tracking-[0.35em] uppercase mb-4 font-medium">
               Премиальные диски в Минске
             </p>
             
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.1] mb-5 sm:mb-7">
+            <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] mb-4">
               <span className="text-foreground">Совершенство</span>
               <br />
               <span className="text-primary">в деталях</span>
             </h1>
             
-            <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-lg mx-auto md:mx-0 leading-relaxed mb-6 md:mb-8">
+            <p className="text-muted-foreground text-base lg:text-lg max-w-xl leading-relaxed">
               Откройте коллекцию эксклюзивных литых и кованых дисков от ведущих мировых производителей. Бесплатная примерка на ваш автомобиль.
             </p>
+          </div>
 
-            {/* Кнопки - только на десктопе */}
-            <div className="hidden md:flex flex-row gap-4 mb-12">
-              <Link href="/catalog">
-                <Button 
-                  size="lg" 
-                  className="group relative px-10 py-7 text-lg font-bold rounded-full bg-primary hover:bg-primary/90 shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 hover:scale-105"
-                >
-                  <span className="relative z-10 flex items-center justify-center gap-3">
-                    Каталог
-                    <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </Button>
-              </Link>
-              <Link href="/ar-fitting">
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="px-8 py-7 text-base font-semibold rounded-full border-2 hover:bg-secondary transition-all duration-300"
-                >
-                  Примерка дисков
-                </Button>
-              </Link>
+          {/* Кнопки слева + Машина справа */}
+          <div className="flex-1 flex items-center mt-6">
+            
+            {/* Левая часть - кнопки и статистика */}
+            <div className={`flex flex-col z-10 transition-all duration-1000 ease-out delay-200 ${
+              isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}>
+              {/* Кнопки */}
+              <div className="flex flex-row gap-4 mb-10">
+                <Link href="/catalog">
+                  <Button 
+                    size="lg" 
+                    className="group relative px-10 py-7 text-lg font-bold rounded-full bg-primary hover:bg-primary/90 shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 hover:scale-105"
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-3">
+                      Каталог
+                      <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </Button>
+                </Link>
+                <Link href="/ar-fitting">
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    className="px-8 py-7 text-base font-semibold rounded-full border-2 hover:bg-secondary transition-all duration-300"
+                  >
+                    Примерка дисков
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Статистика */}
+              <div className="grid grid-cols-3 gap-10">
+                <div>
+                  <div className="text-3xl lg:text-4xl font-bold text-foreground">500+</div>
+                  <div className="text-sm text-muted-foreground mt-1">Моделей дисков</div>
+                </div>
+                <div>
+                  <div className="text-3xl lg:text-4xl font-bold text-foreground">50+</div>
+                  <div className="text-sm text-muted-foreground mt-1">Брендов</div>
+                </div>
+                <div>
+                  <div className="text-3xl lg:text-4xl font-bold text-foreground">10K+</div>
+                  <div className="text-sm text-muted-foreground mt-1">Довольных клиентов</div>
+                </div>
+              </div>
             </div>
 
-            {/* Статистика - только на десктопе */}
-            <div className="hidden md:grid grid-cols-3 gap-10 mt-8">
-              <div>
-                <div className="text-3xl md:text-4xl font-bold text-foreground">500+</div>
-                <div className="text-sm text-muted-foreground mt-1">Моделей дисков</div>
-              </div>
-              <div>
-                <div className="text-3xl md:text-4xl font-bold text-foreground">50+</div>
-                <div className="text-sm text-muted-foreground mt-1">Брендов</div>
-              </div>
-              <div>
-                <div className="text-3xl md:text-4xl font-bold text-foreground">10K+</div>
-                <div className="text-sm text-muted-foreground mt-1">Довольных клиентов</div>
+            {/* Правая часть - машина */}
+            <div className={`flex-1 relative h-full transition-all duration-1000 ease-out delay-300 ${
+              isContentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
+            }`}>
+              <div className="absolute inset-0">
+                {/* Градиентные маски */}
+                <div className="absolute inset-0 z-10 pointer-events-none">
+                  <div className="absolute top-0 bottom-0 left-0 w-32 bg-gradient-to-r from-background to-transparent" />
+                  <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-background to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent" />
+                </div>
+                <Image
+                  src="https://ibnoxxcnwq9eia7i.public.blob.vercel-storage.com/images/1000066017.png"
+                  alt="Спортивный автомобиль с премиальными литыми дисками"
+                  fill
+                  className="object-contain object-right mix-blend-screen"
+                  priority
+                  sizes="60vw"
+                />
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Изображение автомобиля - только мобильная версия */}
-          <div className={`md:hidden flex-1 relative -mt-2 -mx-4 sm:-mx-6 transition-all duration-1000 ease-out delay-300 ${
+        {/* МОБИЛЬНАЯ ВЕРСИЯ */}
+        <div className="flex md:hidden flex-col">
+          
+          {/* Текст */}
+          <div className={`text-center z-10 transition-all duration-1000 ease-out ${
+            isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}>
+            <p className="text-muted-foreground text-xs sm:text-sm tracking-[0.35em] uppercase mb-2 font-medium">
+              Премиальные диски в Минске
+            </p>
+            
+            <h1 className="text-4xl sm:text-5xl font-bold leading-[1.1] mb-2">
+              <span className="text-foreground">Совершенство</span>
+              <br />
+              <span className="text-primary">в деталях</span>
+            </h1>
+            
+            <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto leading-relaxed">
+              Откройте коллекцию эксклюзивных литых и кованых дисков от ведущих мировых производителей. Бесплатная примерка на ваш автомобиль.
+            </p>
+          </div>
+
+          {/* Изображение автомобиля */}
+          <div className={`relative -mt-2 -mx-4 sm:-mx-6 transition-all duration-1000 ease-out delay-300 ${
             isContentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
           }`}>
             <div className="relative w-full h-[220px] sm:h-[280px] overflow-visible">
               {/* Градиентные маски для плавного перехода */}
               <div className="absolute inset-0 z-10 pointer-events-none">
-                {/* Верхняя маска */}
                 <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-background to-transparent" />
-                {/* Нижняя маска */}
                 <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-background to-transparent" />
-                {/* Левая маска */}
                 <div className="absolute top-0 bottom-0 left-0 w-12 bg-gradient-to-r from-background to-transparent" />
-                {/* Правая маска */}
                 <div className="absolute top-0 bottom-0 right-0 w-16 bg-gradient-to-l from-background to-transparent" />
               </div>
               <Image
@@ -137,49 +167,49 @@ export function HeroSection() {
               />
             </div>
           </div>
-        </div>
 
-        {/* Мобильная версия: кнопки после картинки */}
-        <div className={`md:hidden flex flex-col sm:flex-row gap-3 justify-center mt-0 transition-all duration-700 delay-400 ${
-          isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`}>
-          <Link href="/catalog" className="w-full sm:w-auto">
-            <Button 
-              size="lg" 
-              className="group relative px-8 py-6 text-base font-bold rounded-full bg-primary hover:bg-primary/90 shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 hover:scale-105 w-full"
-            >
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                Каталог
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </span>
-            </Button>
-          </Link>
-          <Link href="/ar-fitting" className="w-full sm:w-auto">
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="px-8 py-6 text-base font-semibold rounded-full border-2 hover:bg-secondary transition-all duration-300 w-full"
-            >
-              Примерка дисков
-            </Button>
-          </Link>
-        </div>
+          {/* Кнопки */}
+          <div className={`flex flex-col sm:flex-row gap-3 justify-center mt-0 transition-all duration-700 delay-400 ${
+            isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}>
+            <Link href="/catalog" className="w-full sm:w-auto">
+              <Button 
+                size="lg" 
+                className="group relative px-8 py-6 text-base font-bold rounded-full bg-primary hover:bg-primary/90 shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 hover:scale-105 w-full"
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  Каталог
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </Button>
+            </Link>
+            <Link href="/ar-fitting" className="w-full sm:w-auto">
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="px-8 py-6 text-base font-semibold rounded-full border-2 hover:bg-secondary transition-all duration-300 w-full"
+              >
+                Примерка дисков
+              </Button>
+            </Link>
+          </div>
 
-        {/* Статистика - только на мобильном */}
-        <div className={`md:hidden grid grid-cols-3 gap-6 mt-8 text-center w-full transition-all duration-700 delay-500 ${
-          isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`}>
-          <div>
-            <div className="text-2xl sm:text-3xl font-bold text-foreground">500+</div>
-            <div className="text-xs sm:text-sm text-muted-foreground mt-1">Моделей</div>
-          </div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-bold text-foreground">50+</div>
-            <div className="text-xs sm:text-sm text-muted-foreground mt-1">Брендов</div>
-          </div>
-          <div>
-            <div className="text-2xl sm:text-3xl font-bold text-foreground">10K+</div>
-            <div className="text-xs sm:text-sm text-muted-foreground mt-1">Клиентов</div>
+          {/* Статистика */}
+          <div className={`grid grid-cols-3 gap-6 mt-8 text-center w-full transition-all duration-700 delay-500 ${
+            isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}>
+            <div>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground">500+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground mt-1">Моделей</div>
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground">50+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground mt-1">Брендов</div>
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground">10K+</div>
+              <div className="text-xs sm:text-sm text-muted-foreground mt-1">Клиентов</div>
+            </div>
           </div>
         </div>
       </div>
