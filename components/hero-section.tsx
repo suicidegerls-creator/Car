@@ -52,28 +52,28 @@ export function HeroSection() {
           </div>
 
           {/* Контейнер с машиной на всю ширину и кнопками поверх */}
-          <div className="flex-1 relative -mt-12 -mx-16 lg:-mx-24 xl:-mx-32">
+          <div className="flex-1 relative mt-6">
             
-            {/* Машина на весь контейнер */}
-            <div className={`absolute inset-0 -top-8 -bottom-8 transition-all duration-1000 ease-out delay-300 ${
+            {/* Машина на весь контейнер - абсолютное позиционирование на всю секцию */}
+            <div className={`absolute inset-0 -left-16 -right-16 lg:-left-24 lg:-right-24 xl:-left-32 xl:-right-32 transition-all duration-1000 ease-out delay-300 ${
               isContentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
             }`}>
               <Image
                 src="https://ibnoxxcnwq9eia7i.public.blob.vercel-storage.com/images/1000066017.png"
                 alt="Спортивный автомобиль с премиальными литыми дисками"
                 fill
-                className="object-cover object-right mix-blend-screen"
+                className="object-contain object-bottom mix-blend-screen"
                 priority
                 sizes="100vw"
               />
             </div>
             
-            {/* Кнопки и статистика поверх машины */}
-            <div className={`absolute bottom-16 left-16 lg:left-24 xl:left-32 z-10 transition-all duration-1000 ease-out delay-200 ${
+            {/* Кнопки и статистика поверх машины - внизу слева */}
+            <div className={`absolute bottom-8 left-0 z-10 transition-all duration-1000 ease-out delay-200 ${
               isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}>
               {/* Кнопки */}
-              <div className="flex flex-row gap-4 mb-8">
+              <div className="flex flex-row gap-4 mb-6">
                 <Link href="/catalog">
                   <Button 
                     size="lg" 
