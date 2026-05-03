@@ -26,32 +26,52 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-gradient-to-br from-background via-secondary/30 to-background" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
       
+      {/* Изображение автомобиля - на весь экран справа (только десктоп) */}
+      <div className={`hidden md:block absolute top-1/2 -translate-y-1/2 right-0 w-[55%] h-[90%] transition-all duration-1000 ease-out delay-300 ${
+        isContentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
+      }`}>
+        {/* Градиентные маски */}
+        <div className="absolute inset-0 z-10 pointer-events-none">
+          <div className="absolute top-0 bottom-0 left-0 w-64 bg-gradient-to-r from-background to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-background to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+        </div>
+        <Image
+          src="https://ibnoxxcnwq9eia7i.public.blob.vercel-storage.com/images/1000066017.png"
+          alt="Спортивный автомобиль с премиальными литыми дисками"
+          fill
+          className="object-cover object-center mix-blend-screen scale-125"
+          priority
+          sizes="60vw"
+        />
+      </div>
+      
       {/* Основной контент */}
-      <div className="relative flex-1 flex flex-col max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 lg:pt-32 pb-20">
+      <div className="relative flex-1 flex flex-col max-w-7xl mx-auto px-4 sm:px-6 md:px-8 pt-24 md:pt-32 pb-20">
         
         {/* Контейнер: текст слева, картинка справа */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:gap-8 flex-1">
+        <div className="flex flex-col md:flex-row md:items-center md:gap-8 flex-1">
           
           {/* Левая часть - текст */}
-          <div className={`flex-1 text-center lg:text-left z-10 transition-all duration-1000 ease-out ${
+          <div className={`flex-1 md:max-w-xl text-center md:text-left z-10 transition-all duration-1000 ease-out ${
             isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}>
             <p className="text-muted-foreground text-xs sm:text-sm tracking-[0.35em] uppercase mb-4 sm:mb-6 font-medium">
               Премиальные диски в Минске
             </p>
             
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-5 sm:mb-7">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.1] mb-5 sm:mb-7">
               <span className="text-foreground">Совершенство</span>
               <br />
               <span className="text-primary">в деталях</span>
             </h1>
             
-            <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-lg mx-auto lg:mx-0 leading-relaxed mb-6 lg:mb-8">
+            <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-lg mx-auto md:mx-0 leading-relaxed mb-6 md:mb-8">
               Откройте коллекцию эксклюзивных литых и кованых дисков от ведущих мировых производителей. Бесплатная примерка на ваш автомобиль.
             </p>
 
             {/* Кнопки - только на десктопе */}
-            <div className="hidden lg:flex flex-row gap-4 mb-12">
+            <div className="hidden md:flex flex-row gap-4 mb-12">
               <Link href="/catalog">
                 <Button 
                   size="lg" 
@@ -75,29 +95,29 @@ export function HeroSection() {
             </div>
 
             {/* Статистика - только на десктопе */}
-            <div className="hidden lg:grid grid-cols-3 gap-10 mt-8">
+            <div className="hidden md:grid grid-cols-3 gap-10 mt-8">
               <div>
-                <div className="text-3xl lg:text-4xl font-bold text-foreground">500+</div>
+                <div className="text-3xl md:text-4xl font-bold text-foreground">500+</div>
                 <div className="text-sm text-muted-foreground mt-1">Моделей дисков</div>
               </div>
               <div>
-                <div className="text-3xl lg:text-4xl font-bold text-foreground">50+</div>
+                <div className="text-3xl md:text-4xl font-bold text-foreground">50+</div>
                 <div className="text-sm text-muted-foreground mt-1">Брендов</div>
               </div>
               <div>
-                <div className="text-3xl lg:text-4xl font-bold text-foreground">10K+</div>
+                <div className="text-3xl md:text-4xl font-bold text-foreground">10K+</div>
                 <div className="text-sm text-muted-foreground mt-1">Довольных клиентов</div>
               </div>
             </div>
           </div>
 
-          {/* Правая часть - изображение автомобиля */}
-          <div className={`flex-1 relative -mt-2 lg:mt-0 -mx-4 sm:-mx-6 lg:mx-0 transition-all duration-1000 ease-out delay-300 ${
+          {/* Изображение автомобиля - только мобильная версия */}
+          <div className={`md:hidden flex-1 relative -mt-2 -mx-4 sm:-mx-6 transition-all duration-1000 ease-out delay-300 ${
             isContentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
           }`}>
-            <div className="relative w-full h-[220px] sm:h-[280px] lg:h-[450px] xl:h-[500px] overflow-visible">
-              {/* Градиентные маски для плавного перехода - мобильная версия */}
-              <div className="absolute inset-0 z-10 pointer-events-none lg:hidden">
+            <div className="relative w-full h-[220px] sm:h-[280px] overflow-visible">
+              {/* Градиентные маски для плавного перехода */}
+              <div className="absolute inset-0 z-10 pointer-events-none">
                 {/* Верхняя маска */}
                 <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-background to-transparent" />
                 {/* Нижняя маска */}
@@ -107,25 +127,20 @@ export function HeroSection() {
                 {/* Правая маска */}
                 <div className="absolute top-0 bottom-0 right-0 w-16 bg-gradient-to-l from-background to-transparent" />
               </div>
-              {/* Градиентные маски для плавного перехода - десктоп версия */}
-              <div className="absolute inset-0 z-10 pointer-events-none hidden lg:block">
-                {/* Левая маска для плавного перехода к тексту */}
-                <div className="absolute top-0 bottom-0 left-0 w-24 bg-gradient-to-r from-background to-transparent" />
-              </div>
               <Image
                 src="https://ibnoxxcnwq9eia7i.public.blob.vercel-storage.com/images/1000066017.png"
                 alt="Спортивный автомобиль с премиальными литыми дисками"
                 fill
-                className="object-cover object-center lg:object-contain lg:object-right mix-blend-screen lg:mix-blend-normal"
+                className="object-cover object-center mix-blend-screen"
                 priority
-                sizes="(max-width: 768px) 100vw, 50vw"
+                sizes="100vw"
               />
             </div>
           </div>
         </div>
 
         {/* Мобильная версия: кнопки после картинки */}
-        <div className={`lg:hidden flex flex-col sm:flex-row gap-3 justify-center mt-0 transition-all duration-700 delay-400 ${
+        <div className={`md:hidden flex flex-col sm:flex-row gap-3 justify-center mt-0 transition-all duration-700 delay-400 ${
           isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
           <Link href="/catalog" className="w-full sm:w-auto">
@@ -151,7 +166,7 @@ export function HeroSection() {
         </div>
 
         {/* Статистика - только на мобильном */}
-        <div className={`lg:hidden grid grid-cols-3 gap-6 mt-8 text-center w-full transition-all duration-700 delay-500 ${
+        <div className={`md:hidden grid grid-cols-3 gap-6 mt-8 text-center w-full transition-all duration-700 delay-500 ${
           isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
           <div>
