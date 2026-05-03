@@ -32,8 +32,8 @@ export function HeroSection() {
         {/* ДЕСКТОП ВЕРСИЯ */}
         <div className="hidden md:flex flex-col flex-1">
           
-          {/* Текст сверху */}
-          <div className={`z-10 transition-all duration-1000 ease-out ${
+          {/* Текст сверху по центру */}
+          <div className={`z-10 text-center transition-all duration-1000 ease-out ${
             isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}>
             <p className="text-muted-foreground text-xs sm:text-sm tracking-[0.35em] uppercase mb-4 font-medium">
@@ -46,20 +46,34 @@ export function HeroSection() {
               <span className="text-primary">в деталях</span>
             </h1>
             
-            <p className="text-muted-foreground text-base lg:text-lg max-w-xl leading-relaxed">
+            <p className="text-muted-foreground text-base lg:text-lg max-w-2xl mx-auto leading-relaxed">
               Откройте коллекцию эксклюзивных литых и кованых дисков от ведущих мировых производителей. Бесплатная примерка на ваш автомобиль.
             </p>
           </div>
 
-          {/* Кнопки слева + Машина справа */}
-          <div className="flex-1 flex items-center mt-6">
+          {/* Контейнер с машиной на всю ширину и кнопками поверх */}
+          <div className="flex-1 relative -mt-12 -mx-16 lg:-mx-24 xl:-mx-32">
             
-            {/* Левая часть - кнопки и статистика */}
-            <div className={`flex flex-col z-10 transition-all duration-1000 ease-out delay-200 ${
+            {/* Машина на весь контейнер */}
+            <div className={`absolute inset-0 -top-8 -bottom-8 transition-all duration-1000 ease-out delay-300 ${
+              isContentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
+            }`}>
+              <Image
+                src="https://ibnoxxcnwq9eia7i.public.blob.vercel-storage.com/images/1000066017.png"
+                alt="Спортивный автомобиль с премиальными литыми дисками"
+                fill
+                className="object-cover object-right mix-blend-screen"
+                priority
+                sizes="100vw"
+              />
+            </div>
+            
+            {/* Кнопки и статистика поверх машины */}
+            <div className={`absolute bottom-16 left-16 lg:left-24 xl:left-32 z-10 transition-all duration-1000 ease-out delay-200 ${
               isContentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}>
               {/* Кнопки */}
-              <div className="flex flex-row gap-4 mb-10">
+              <div className="flex flex-row gap-4 mb-8">
                 <Link href="/catalog">
                   <Button 
                     size="lg" 
@@ -75,7 +89,7 @@ export function HeroSection() {
                   <Button 
                     size="lg" 
                     variant="outline"
-                    className="px-8 py-7 text-base font-semibold rounded-full border-2 hover:bg-secondary transition-all duration-300"
+                    className="px-8 py-7 text-base font-semibold rounded-full border-2 bg-background/80 backdrop-blur-sm hover:bg-secondary transition-all duration-300"
                   >
                     Примерка дисков
                   </Button>
@@ -83,7 +97,7 @@ export function HeroSection() {
               </div>
 
               {/* Статистика */}
-              <div className="grid grid-cols-3 gap-10">
+              <div className="grid grid-cols-3 gap-8">
                 <div>
                   <div className="text-3xl lg:text-4xl font-bold text-foreground">500+</div>
                   <div className="text-sm text-muted-foreground mt-1">Моделей дисков</div>
@@ -96,28 +110,6 @@ export function HeroSection() {
                   <div className="text-3xl lg:text-4xl font-bold text-foreground">10K+</div>
                   <div className="text-sm text-muted-foreground mt-1">Довольных клиентов</div>
                 </div>
-              </div>
-            </div>
-
-            {/* Правая часть - машина */}
-            <div className={`flex-1 relative h-full transition-all duration-1000 ease-out delay-300 ${
-              isContentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'
-            }`}>
-              <div className="absolute inset-0">
-                {/* Градиентные маски */}
-                <div className="absolute inset-0 z-10 pointer-events-none">
-                  <div className="absolute top-0 bottom-0 left-0 w-32 bg-gradient-to-r from-background to-transparent" />
-                  <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-background to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent" />
-                </div>
-                <Image
-                  src="https://ibnoxxcnwq9eia7i.public.blob.vercel-storage.com/images/1000066017.png"
-                  alt="Спортивный автомобиль с премиальными литыми дисками"
-                  fill
-                  className="object-contain object-right mix-blend-screen"
-                  priority
-                  sizes="60vw"
-                />
               </div>
             </div>
           </div>
