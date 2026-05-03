@@ -83,7 +83,7 @@ export default function SensorsPage() {
                   <div className="relative p-8 flex items-center justify-center min-h-[300px] overflow-hidden bg-gradient-to-br from-slate-100 via-blue-50 to-white">
                     <div className="relative w-48 h-48 md:w-64 md:h-64">
                       <Image
-                        src="/images/sensor.jpg"
+                        src="/images/tpms-sensor.png"
                         alt="Датчик давления шин TPMS"
                         fill
                         className="object-contain drop-shadow-lg"

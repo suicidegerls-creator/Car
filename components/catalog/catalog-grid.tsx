@@ -228,15 +228,44 @@ export function CatalogGrid({ wheels, loading }: CatalogGridProps) {
 
   if (wheels.length === 0) {
     return (
-      <div className="text-center py-16">
-        <Package className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium mb-2">Товары не найдены</h3>
-        <p className="text-muted-foreground mb-4">
-          Попробуйте изменить параметры фильтрации
-        </p>
-        <Button variant="outline" asChild>
-          <Link href="/catalog">Сбросить фильтры</Link>
-        </Button>
+      <div className="flex flex-col items-center justify-center py-16 px-4">
+        {/* Декоративная иконка */}
+        <div className="relative mb-6">
+          <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
+          <div className="relative bg-gradient-to-br from-primary/10 to-primary/5 rounded-full p-6 border border-primary/20">
+            <Package className="w-12 h-12 text-primary" />
+          </div>
+        </div>
+        
+        {/* Основной текст */}
+        <div className="text-center max-w-md space-y-4">
+          <h3 className="text-xl sm:text-2xl font-bold text-foreground">
+            По заданным параметрам ничего не найдено...
+          </h3>
+          
+          <div className="space-y-2">
+            <p className="text-muted-foreground text-sm sm:text-base">
+              ...НО вы можете обратиться к менеджеру для уточнения возможности модификации понравившегося диска под ваш автомобиль
+            </p>
+            <p className="text-primary font-semibold text-base sm:text-lg">
+              В ДискиБел нет ничего невозможного
+            </p>
+          </div>
+        </div>
+        
+        {/* Кнопки действий */}
+        <div className="flex flex-col sm:flex-row gap-3 mt-8">
+          <Button variant="default" asChild className="min-w-[180px]">
+            <Link href="tel:+375296576960">
+              Позвонить менеджеру
+            </Link>
+          </Button>
+          <Button variant="outline" asChild className="min-w-[180px]">
+            <Link href="/catalog">
+              Сбросить фильтры
+            </Link>
+          </Button>
+        </div>
       </div>
     )
   }

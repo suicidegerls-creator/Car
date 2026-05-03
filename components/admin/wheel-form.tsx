@@ -19,19 +19,22 @@ import {
   Wheel,
   CarCompatibility,
   WHEEL_TYPE_LABELS,
-  PCD_OPTIONS,
-  DIAMETER_OPTIONS,
-  WIDTH_OPTIONS,
-  BRAND_OPTIONS,
-  CENTER_BORE_OPTIONS,
-  ET_OPTIONS,
   BOLTS_COUNT_OPTIONS,
-  COLOR_OPTIONS,
-  FINISH_OPTIONS,
-  MATERIAL_OPTIONS,
-  COUNTRY_OPTIONS,
   CAR_YEARS,
 } from '@/lib/types/wheel'
+
+interface FilterOptions {
+  diameters: number[]
+  widths: string[]
+  pcds: string[]
+  ets: number[]
+  centerBores: string[]
+  brands: string[]
+  colors: string[]
+  finishes: string[]
+  materials: string[]
+  countries: string[]
+}
 
 interface CarBrand {
   id: string
@@ -70,11 +73,19 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
   const [carBrands, setCarBrands] = useState<CarBrand[]>([])
   const [carModelsCache, setCarModelsCache] = useState<Record<string, CarModel[]>>({})
 
-  // Load car brands on mount
+  // Dynamic filter options from database
+  const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null)
+
+  // Load car brands and filter options on mount
   useEffect(() => {
     fetch('/api/car-brands')
       .then(res => res.json())
       .then(data => setCarBrands(data))
+      .catch(console.error)
+
+    fetch('/api/filter-options')
+      .then(res => res.json())
+      .then(data => setFilterOptions(data))
       .catch(console.error)
   }, [])
 
@@ -384,17 +395,19 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
         </div>
         <div className="space-y-2">
           <Label htmlFor="brand">Бренд *</Label>
-          <Select value={formData.brand || 'none'} onValueChange={(v) => handleChange('brand', v === 'none' ? '' : v)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Выберите бренд" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Выберите бренд</SelectItem>
-              {BRAND_OPTIONS.map((brand) => (
-                <SelectItem key={brand} value={brand}>{brand}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Input
+            id="brand"
+            value={formData.brand}
+            onChange={(e) => handleChange('brand', e.target.value)}
+            placeholder="Введите или выберите бренд"
+            list="brand-options"
+            required
+          />
+          <datalist id="brand-options">
+            {filterOptions?.brands.map((brand) => (
+              <option key={brand} value={brand} />
+            ))}
+          </datalist>
         </div>
         <div className="space-y-2">
           <Label htmlFor="model">Модель</Label>
@@ -478,68 +491,78 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
           </div>
           <div className="space-y-2">
             <Label>Диаметр *</Label>
-            <Select value={formData.diameter} onValueChange={(v) => handleChange('diameter', v)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {DIAMETER_OPTIONS.map((d) => (
-                  <SelectItem key={d} value={d.toString()}>R{d}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              value={formData.diameter}
+              onChange={(e) => handleChange('diameter', e.target.value)}
+              placeholder="17"
+              list="diameter-options"
+              required
+            />
+            <datalist id="diameter-options">
+              {filterOptions?.diameters.map((d) => (
+                <option key={d} value={d.toString()}>{`R${d}`}</option>
+              ))}
+            </datalist>
           </div>
           <div className="space-y-2">
             <Label>Ширина (J) *</Label>
-            <Select value={formData.width} onValueChange={(v) => handleChange('width', v)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {WIDTH_OPTIONS.map((w) => (
-                  <SelectItem key={w} value={w}>{w}J</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              value={formData.width}
+              onChange={(e) => handleChange('width', e.target.value)}
+              placeholder="7.0"
+              list="width-options"
+              required
+            />
+            <datalist id="width-options">
+              {filterOptions?.widths.map((w) => (
+                <option key={w} value={w}>{`${w}J`}</option>
+              ))}
+            </datalist>
           </div>
           <div className="space-y-2">
             <Label>PCD (разболтовка) *</Label>
-            <Select value={formData.pcd} onValueChange={(v) => handleChange('pcd', v)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PCD_OPTIONS.map((pcd) => (
-                  <SelectItem key={pcd} value={pcd}>{pcd}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              value={formData.pcd}
+              onChange={(e) => handleChange('pcd', e.target.value)}
+              placeholder="5x114.3"
+              list="pcd-options"
+              required
+            />
+            <datalist id="pcd-options">
+              {filterOptions?.pcds.map((pcd) => (
+                <option key={pcd} value={pcd} />
+              ))}
+            </datalist>
           </div>
           <div className="space-y-2">
             <Label>Вылет ET *</Label>
-            <Select value={formData.et} onValueChange={(v) => handleChange('et', v)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {ET_OPTIONS.map((et) => (
-                  <SelectItem key={`et-${et}`} value={et}>ET {et}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              value={formData.et}
+              onChange={(e) => handleChange('et', e.target.value)}
+              placeholder="40"
+              list="et-options"
+              required
+            />
+            <datalist id="et-options">
+              {filterOptions?.ets.map((et) => (
+                <option key={et} value={et.toString()}>{`ET ${et}`}</option>
+              ))}
+            </datalist>
           </div>
           <div className="space-y-2">
             <Label>ЦО (мм) *</Label>
-            <Select value={formData.center_bore} onValueChange={(v) => handleChange('center_bore', v)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CENTER_BORE_OPTIONS.map((cb) => (
-                  <SelectItem key={cb} value={cb}>{cb}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              value={formData.center_bore}
+              onChange={(e) => handleChange('center_bore', e.target.value)}
+              placeholder="67.1"
+              list="center-bore-options"
+              required
+            />
+            <datalist id="center-bore-options">
+              {filterOptions?.centerBores.map((cb) => (
+                <option key={cb} value={cb} />
+              ))}
+            </datalist>
           </div>
           <div className="space-y-2">
             <Label>Кол-во болтов</Label>
@@ -578,71 +601,59 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="space-y-2">
             <Label>Цвет</Label>
-            <Select
-              value={formData.color || 'none'}
-              onValueChange={(v) => handleChange('color', v === 'none' ? '' : v)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите цвет" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Не указан</SelectItem>
-                {COLOR_OPTIONS.map((color) => (
-                  <SelectItem key={color} value={color}>{color}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              value={formData.color}
+              onChange={(e) => handleChange('color', e.target.value)}
+              placeholder="Введите или выберите цвет"
+              list="color-options"
+            />
+            <datalist id="color-options">
+              {filterOptions?.colors.map((color) => (
+                <option key={color} value={color} />
+              ))}
+            </datalist>
           </div>
           <div className="space-y-2">
             <Label>Покрытие</Label>
-            <Select
-              value={formData.finish || 'none'}
-              onValueChange={(v) => handleChange('finish', v === 'none' ? '' : v)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите покрытие" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Не указано</SelectItem>
-                {FINISH_OPTIONS.map((finish) => (
-                  <SelectItem key={finish} value={finish}>{finish}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              value={formData.finish}
+              onChange={(e) => handleChange('finish', e.target.value)}
+              placeholder="Введите или выберите покрытие"
+              list="finish-options"
+            />
+            <datalist id="finish-options">
+              {filterOptions?.finishes.map((finish) => (
+                <option key={finish} value={finish} />
+              ))}
+            </datalist>
           </div>
           <div className="space-y-2">
             <Label>Материал</Label>
-            <Select
-              value={formData.material || 'none'}
-              onValueChange={(v) => handleChange('material', v === 'none' ? '' : v)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите материал" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Не указан</SelectItem>
-                {MATERIAL_OPTIONS.map((material) => (
-                  <SelectItem key={material} value={material}>{material}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              value={formData.material}
+              onChange={(e) => handleChange('material', e.target.value)}
+              placeholder="Введите или выберите материал"
+              list="material-options"
+            />
+            <datalist id="material-options">
+              {filterOptions?.materials.map((material) => (
+                <option key={material} value={material} />
+              ))}
+            </datalist>
           </div>
           <div className="space-y-2">
             <Label>Страна производства</Label>
-            <Select
-              value={formData.country || 'none'}
-              onValueChange={(v) => handleChange('country', v === 'none' ? '' : v)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите страну" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Не указана</SelectItem>
-                {COUNTRY_OPTIONS.map((country) => (
-                  <SelectItem key={country} value={country}>{country}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              value={formData.country}
+              onChange={(e) => handleChange('country', e.target.value)}
+              placeholder="Введите или выберите страну"
+              list="country-options"
+            />
+            <datalist id="country-options">
+              {filterOptions?.countries.map((country) => (
+                <option key={country} value={country} />
+              ))}
+            </datalist>
           </div>
         </div>
       </div>
@@ -810,7 +821,7 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
                           </Select>
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs">��одификация</Label>
+                          <Label className="text-xs">Модификация</Label>
                           <Input
                             value={car.car_modification || ''}
                             onChange={(e) => updateCarCompatibility(index, 'car_modification', e.target.value || undefined)}

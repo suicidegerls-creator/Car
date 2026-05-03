@@ -209,7 +209,7 @@ export function AdminDashboard() {
               </div>
             ) : wheels.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
-                Товары не найдены. Добавьте перв��й диск!
+                Товары не найдены. Добавьте первый диск!
               </div>
             ) : (
               <Table>

@@ -165,7 +165,7 @@ export function SupportWidget() {
                   Выберите удобный способ связи или оставьте заявку
                 </p>
 
-                {/* Быс��рая связь */}
+                {/* Быстрая связь */}
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                     Быстрая связь

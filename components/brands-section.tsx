@@ -6,16 +6,26 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const brands = [
-  "BBS",
-  "OZ Racing",
-  "Vossen",
-  "Enkei",
-  "Work Wheels",
-  "Rays",
-  "HRE",
-  "ADV.1",
-  "Rotiform",
-  "Forgiato",
+  "Techline",
+  "RST",
+  "Venti",
+  "K&K",
+  "SKAD",
+  "SL",
+  "iFree",
+  "Alcasta",
+  "Carwel",
+  "Vector",
+  "Megami",
+  "X-Trike",
+  "CCC",
+  "Replika",
+  "Neo",
+  "KiK",
+  "K7",
+  "TL",
+  "Proma",
+  "AUDI",
 ]
 
 export function BrandsSection() {

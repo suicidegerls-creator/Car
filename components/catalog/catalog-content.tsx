@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { CatalogFilters } from './catalog-filters'
 import { CatalogGrid } from './catalog-grid'
 import { CatalogPagination } from './catalog-pagination'
@@ -23,6 +23,7 @@ export function CatalogContent() {
 function CatalogContentInner() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
   const [wheels, setWheels] = useState<Wheel[]>([])
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
@@ -71,11 +72,11 @@ function CatalogContentInner() {
       params.set('page', '1')
     }
     
-    router.push(`/catalog?${params.toString()}`)
+    router.push(`${pathname}?${params.toString()}`)
   }
 
   const clearFilters = () => {
-    router.push('/catalog')
+    router.push(pathname)
   }
 
   const activeFiltersCount = Array.from(searchParams.entries()).filter(

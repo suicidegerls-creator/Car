@@ -17,15 +17,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Car, Settings2, Search, ChevronDown, ChevronUp } from 'lucide-react'
 import {
   WHEEL_TYPE_LABELS,
-  PCD_OPTIONS,
-  DIAMETER_OPTIONS,
-  WIDTH_OPTIONS,
-  BRAND_OPTIONS,
-  CENTER_BORE_OPTIONS,
-  ET_OPTIONS,
   CAR_YEARS,
   CAR_MODIFICATIONS,
 } from '@/lib/types/wheel'
+
+interface FilterOptions {
+  diameters: number[]
+  widths: string[]
+  pcds: string[]
+  ets: number[]
+  centerBores: string[]
+  brands: string[]
+  colors: string[]
+  finishes: string[]
+  materials: string[]
+  countries: string[]
+  wheelTypes: string[]
+}
 
 interface CarBrand {
   id: string
@@ -59,8 +67,13 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
   const [loadingBrands, setLoadingBrands] = useState(true)
   const [loadingModels, setLoadingModels] = useState(false)
 
-  // Load car brands on mount
+  // Dynamic filter options from database
+  const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null)
+  const [loadingFilters, setLoadingFilters] = useState(true)
+
+  // Load car brands and filter options on mount
   useEffect(() => {
+    // Load car brands
     fetch('/api/car-brands')
       .then(res => res.json())
       .then(data => {
@@ -68,6 +81,15 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
         setLoadingBrands(false)
       })
       .catch(() => setLoadingBrands(false))
+
+    // Load dynamic filter options
+    fetch('/api/filter-options')
+      .then(res => res.json())
+      .then(data => {
+        setFilterOptions(data)
+        setLoadingFilters(false)
+      })
+      .catch(() => setLoadingFilters(false))
   }, [])
 
   // Load car models when brand changes
@@ -257,13 +279,13 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
 
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Диаметр</Label>
-              <Select value={selectedCarDiameter} onValueChange={handleCarDiameterChange}>
+              <Select value={selectedCarDiameter} onValueChange={handleCarDiameterChange} disabled={loadingFilters}>
                 <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Любой" />
+                  <SelectValue placeholder={loadingFilters ? "Загрузка..." : "Любой"} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Любой</SelectItem>
-                  {DIAMETER_OPTIONS.map((d) => (
+                  {filterOptions?.diameters.map((d) => (
                     <SelectItem key={d} value={String(d)}>R{d}</SelectItem>
                   ))}
                 </SelectContent>
@@ -309,13 +331,14 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
               <Select
                 value={getSelectValue('diameter')}
                 onValueChange={(v) => updateParams({ diameter: v === 'none' ? null : v })}
+                disabled={loadingFilters}
               >
                 <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Любой" />
+                  <SelectValue placeholder={loadingFilters ? "Загрузка..." : "Любой"} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Любой</SelectItem>
-                  {DIAMETER_OPTIONS.map((d) => (
+                  {filterOptions?.diameters.map((d) => (
                     <SelectItem key={d} value={String(d)}>R{d}</SelectItem>
                   ))}
                 </SelectContent>
@@ -327,13 +350,14 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
               <Select
                 value={getSelectValue('pcd')}
                 onValueChange={(v) => updateParams({ pcd: v === 'none' ? null : v })}
+                disabled={loadingFilters}
               >
                 <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Любая" />
+                  <SelectValue placeholder={loadingFilters ? "Загрузка..." : "Любая"} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Любая</SelectItem>
-                  {PCD_OPTIONS.map((pcd) => (
+                  {filterOptions?.pcds.map((pcd) => (
                     <SelectItem key={pcd} value={pcd}>{pcd}</SelectItem>
                   ))}
                 </SelectContent>
@@ -345,13 +369,14 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
               <Select
                 value={getSelectValue('brand')}
                 onValueChange={(v) => updateParams({ brand: v === 'none' ? null : v })}
+                disabled={loadingFilters}
               >
                 <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Любой" />
+                  <SelectValue placeholder={loadingFilters ? "Загрузка..." : "Любой"} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Любой</SelectItem>
-                  {BRAND_OPTIONS.map((brand) => (
+                  {filterOptions?.brands.map((brand) => (
                     <SelectItem key={brand} value={brand}>{brand}</SelectItem>
                   ))}
                 </SelectContent>
@@ -422,13 +447,14 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
                 <Select
                   value={getSelectValue('min_width')}
                   onValueChange={(v) => updateParams({ min_width: v === 'none' ? null : v })}
+                  disabled={loadingFilters}
                 >
                   <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Любая" />
+                    <SelectValue placeholder={loadingFilters ? "Загрузка..." : "Любая"} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Любая</SelectItem>
-                    {WIDTH_OPTIONS.map((w) => (
+                    {filterOptions?.widths.map((w) => (
                       <SelectItem key={w} value={w}>{w}J</SelectItem>
                     ))}
                   </SelectContent>
@@ -440,13 +466,14 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
                 <Select
                   value={getSelectValue('max_width')}
                   onValueChange={(v) => updateParams({ max_width: v === 'none' ? null : v })}
+                  disabled={loadingFilters}
                 >
                   <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Любая" />
+                    <SelectValue placeholder={loadingFilters ? "Загрузка..." : "Любая"} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Любая</SelectItem>
-                    {WIDTH_OPTIONS.map((w) => (
+                    {filterOptions?.widths.map((w) => (
                       <SelectItem key={w} value={w}>{w}J</SelectItem>
                     ))}
                   </SelectContent>
@@ -458,14 +485,15 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
                 <Select
                   value={getSelectValue('min_et')}
                   onValueChange={(v) => updateParams({ min_et: v === 'none' ? null : v })}
+                  disabled={loadingFilters}
                 >
                   <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Любой" />
+                    <SelectValue placeholder={loadingFilters ? "Загрузка..." : "Любой"} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Любой</SelectItem>
-                    {ET_OPTIONS.filter(e => e && e.length > 0).map((et) => (
-                      <SelectItem key={`min-et-${et}`} value={et}>ET {et}</SelectItem>
+                    {filterOptions?.ets.map((et) => (
+                      <SelectItem key={`min-et-${et}`} value={String(et)}>ET {et}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -476,14 +504,15 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
                 <Select
                   value={getSelectValue('max_et')}
                   onValueChange={(v) => updateParams({ max_et: v === 'none' ? null : v })}
+                  disabled={loadingFilters}
                 >
                   <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Любой" />
+                    <SelectValue placeholder={loadingFilters ? "Загрузка..." : "Любой"} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Любой</SelectItem>
-                    {ET_OPTIONS.filter(e => e && e.length > 0).map((et) => (
-                      <SelectItem key={`max-et-${et}`} value={et}>ET {et}</SelectItem>
+                    {filterOptions?.ets.map((et) => (
+                      <SelectItem key={`max-et-${et}`} value={String(et)}>ET {et}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -494,14 +523,15 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
                 <Select
                   value={getSelectValue('center_bore')}
                   onValueChange={(v) => updateParams({ center_bore: v === 'none' ? null : v })}
+                  disabled={loadingFilters}
                 >
                   <SelectTrigger className="h-10">
-                    <SelectValue placeholder="Любой" />
+                    <SelectValue placeholder={loadingFilters ? "Загрузка..." : "Любой"} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Любой</SelectItem>
-                    {CENTER_BORE_OPTIONS.map((h) => (
-                      <SelectItem key={h} value={h}>{h} мм</SelectItem>
+                    {filterOptions?.centerBores.map((cb) => (
+                      <SelectItem key={cb} value={cb}>{cb} мм</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

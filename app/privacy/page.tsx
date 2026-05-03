@@ -261,7 +261,7 @@ export default function PrivacyPage() {
               <p>По вопросам, связанным с персональными данными, вы можете связаться с нами:</p>
               <div className="space-y-2 mt-4">
                 <p><strong className="text-foreground">Телефон:</strong> +375 (29) 657-69-60</p>
-                <p><strong className="text-foreground">Telegram:</strong> @diskibel</p>
+                <p><strong className="text-foreground">Телефон:</strong> +375 (29) 688-91-88</p>
                 <p><strong className="text-foreground">Адрес:</strong> г. Минск, АвтоМолл, павильон 276</p>
               </div>
             </div>

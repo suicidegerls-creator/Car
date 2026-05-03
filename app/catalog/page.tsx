@@ -3,7 +3,7 @@ import { Footer } from '@/components/footer'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, CircleDot, Wrench, Gauge } from 'lucide-react'
+import { ArrowRight, CircleDot, Wrench, Gauge, Bolt, Circle, Layers } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
@@ -29,7 +29,7 @@ const categories = [
     description: 'Качественные датчики TPMS для контроля давления в шинах вашего автомобиля',
     icon: Gauge,
     href: '/catalog/sensors',
-    image: '/images/sensor.jpg',
+    image: '/images/tpms-sensor.png',
     accent: 'bg-blue-500/10 text-blue-600',
     featured: false,
   },
@@ -41,6 +41,36 @@ const categories = [
     href: '/catalog/services',
     image: null,
     accent: 'bg-emerald-500/10 text-emerald-600',
+    featured: false,
+  },
+  {
+    id: 'fasteners',
+    title: 'Крепёж',
+    description: 'Болты, гайки, секретки и другой крепёж для колёсных дисков',
+    icon: Bolt,
+    href: '/catalog/fasteners',
+    image: '/images/fasteners.png',
+    accent: 'bg-amber-500/10 text-amber-600',
+    featured: false,
+  },
+  {
+    id: 'hub-rings',
+    title: 'Центровочные кольца',
+    description: 'Центровочные кольца для точной установки дисков на ступицу',
+    icon: Circle,
+    href: '/catalog/hub-rings',
+    image: '/images/hub-rings.png',
+    accent: 'bg-violet-500/10 text-violet-600',
+    featured: false,
+  },
+  {
+    id: 'spacers',
+    title: 'Проставки',
+    description: 'Колёсные проставки для изменения вылета и расширения колеи',
+    icon: Layers,
+    href: '/catalog/spacers',
+    image: '/images/spacers.png',
+    accent: 'bg-rose-500/10 text-rose-600',
     featured: false,
   },
 ]
@@ -74,6 +104,12 @@ export default function CatalogPage() {
                         ? 'bg-gradient-to-br from-slate-100 via-blue-50 to-slate-100' 
                         : category.id === 'wheels'
                         ? 'bg-gradient-to-br from-orange-50 to-amber-100'
+                        : category.id === 'fasteners'
+                        ? 'bg-gradient-to-br from-amber-50 via-stone-100 to-amber-50'
+                        : category.id === 'hub-rings'
+                        ? 'bg-gradient-to-br from-violet-50 via-slate-50 to-violet-50'
+                        : category.id === 'spacers'
+                        ? 'bg-gradient-to-br from-rose-50 via-slate-50 to-rose-50'
                         : category.accent
                     }`}>
                       {category.image ? (

@@ -35,23 +35,25 @@ export const ET_OPTIONS: string[] = Array.from(
   (_, i) => String(ET_MIN + i)
 )
 
-// Диаметр центрального отверстия (ЦО)
+// Диаметр центрального отверстия (ЦО) - полный список
 export const CENTER_BORE_OPTIONS = [
-  '54.1', '56.1', '56.6', '57.1', '58.1', '60.1', '63.4', '64.1', '66.1', '66.6',
-  '67.1', '71.6', '72.6', '73.1', '74.1', '78.1', '84.1', '95.1', '106.1', '108.1'
+  // 54-60
+  '54.1', '56.1', '56.6', '57.1', '58.1', '58.6', '59.1', '60.1',
+  // 63-70
+  '63.3', '63.4', '64.1', '65.1', '66.1', '66.5', '66.6', '67.1', '68.1', '69.1', '70.1', '70.3', '70.6',
+  // 71-75
+  '71.1', '71.5', '71.6', '72.5', '72.6', '73.1', '74.1', '75.1',
+  // 76-85
+  '76.1', '77.8', '78.1', '79.5', '79.6', '82.0', '83.1', '84.1', '85.1',
+  // 87-110+
+  '87.1', '89.1', '92.3', '92.5', '93.1', '95.1', '98.1', '100.1', '106.1', '108.1', '110.1'
 ] as const
 
 // Производители дисков
 export const BRAND_OPTIONS = [
-  // Премиум
-  'BBS', 'OZ Racing', 'Enkei', 'Vossen', 'Rotiform', 'HRE', 'Advan',
-  'Work Wheels', 'Rays', 'TWS', 'Weds', 'SSR',
-  // Средний сегмент
-  'American Racing', 'Fuel', 'XD Series', 'Moto Metal', 'KMC', 'TSW', 'Niche',
-  'Vorsteiner', 'Ferrada', 'Stance', 'Avant Garde',
-  // Бюджетный сегмент / СНГ
-  'SKAD', 'K&K', 'LS Wheels', 'Replica', 'Nitro', 'X-Race', 'Alcasta',
-  'Remain', 'Trebl', 'Magnetto', 'Штамп', 'Tech-Line'
+  'Techline', 'RST', 'Venti', 'K&K', 'SKAD', 'SL', 'iFree', 'Alcasta',
+  'Carwel', 'Vector', 'Megami', 'X-Trike', 'CCC', 'Replika', 'Neo',
+  'KiK', 'K7', 'TL', 'Proma', 'AUDI'
 ] as const
 
 // Количество болтов
