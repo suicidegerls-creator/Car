@@ -206,10 +206,10 @@ export function HeroSection() {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="flex flex-col items-center gap-2 text-muted-foreground">
-          <span className="text-xs uppercase tracking-widest">Прокрутите</span>
-          <ChevronDown className="w-5 h-5" />
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 animate-bounce">
+        <div className="flex flex-col items-center gap-1 text-primary">
+          <span className="text-sm font-medium uppercase tracking-widest">Прокрутите</span>
+          <ChevronDown className="w-6 h-6" />
         </div>
       </div>
     </section>

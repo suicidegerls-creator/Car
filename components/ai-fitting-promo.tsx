@@ -32,7 +32,7 @@ export function AIFittingPromo() {
               
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Загрузите фото вашего авто и посмотрите, как будут смотреться новые диски. 
-                Наша ИИ-технология мгновенно покажет результат — никаких догадок!
+                Технология мгновенно покажет результат — никаких догадок!
               </p>
               
               <ul className="space-y-3">

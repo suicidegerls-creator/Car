@@ -15,7 +15,7 @@ const navItems = [
   { name: "Контакты", href: "/contacts" },
 ]
 
-const aiFeature = { name: "ИИ-примерка", href: "/ar-fitting" }
+const aiFeature = { name: "Примерка", href: "/ar-fitting" }
 const wheelFeature = { name: "Колесо Удачи", href: "/wheel" }
 
 export function Header() {

@@ -389,7 +389,7 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
             id="name"
             value={formData.name}
             onChange={(e) => handleChange('name', e.target.value)}
-            placeholder="BBS CI-R 19"
+            placeholder="Techline TL745 17"
             required
           />
         </div>
@@ -424,7 +424,7 @@ export function WheelForm({ wheel, onSuccess }: WheelFormProps) {
             id="sku"
             value={formData.sku}
             onChange={(e) => handleChange('sku', e.target.value)}
-            placeholder="BBS-CIR-19-85"
+            placeholder="TL-745-17-70"
           />
         </div>
       </div>

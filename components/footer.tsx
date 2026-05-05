@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 const footerLinks = {
   catalog: [
     { name: "Все диски", href: "/catalog" },
-    { name: "ИИ-примерка", href: "/ar-fitting" },
+    { name: "Примерка", href: "/ar-fitting" },
     { name: "Бренды", href: "/#brands" },
   ],
   company: [

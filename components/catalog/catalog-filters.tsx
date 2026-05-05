@@ -46,6 +46,9 @@ interface CarModel {
   id: string
   name: string
   brand_id: string
+  pcd?: string
+  center_bore?: number
+  has_params?: boolean
 }
 
 interface CatalogFiltersProps {
@@ -93,22 +96,42 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
   }, [])
 
   // Load car models when brand changes
+  const selectedCarBrandId = searchParams.get('car_brand_id') || 'none'
   const selectedCarBrand = searchParams.get('car_brand') || 'none'
   
   useEffect(() => {
-    if (selectedCarBrand && selectedCarBrand !== 'none') {
+    if (selectedCarBrandId && selectedCarBrandId !== 'none') {
       setLoadingModels(true)
-      fetch(`/api/car-models?brandName=${encodeURIComponent(selectedCarBrand)}`)
+      fetch(`/api/car-models?brandId=${encodeURIComponent(selectedCarBrandId)}&includeParams=true`)
         .then(res => res.json())
         .then(data => {
-          setCarModels(data)
+          // Добавляем флаг has_params для отображения в UI
+          const modelsWithFlag = data.map((m: CarModel) => ({
+            ...m,
+            has_params: !!(m.pcd && m.center_bore)
+          }))
+          setCarModels(modelsWithFlag)
+          setLoadingModels(false)
+        })
+        .catch(() => setLoadingModels(false))
+    } else if (selectedCarBrand && selectedCarBrand !== 'none') {
+      // Обратная совместимость со старым параметром
+      setLoadingModels(true)
+      fetch(`/api/car-models?brandName=${encodeURIComponent(selectedCarBrand)}&includeParams=true`)
+        .then(res => res.json())
+        .then(data => {
+          const modelsWithFlag = data.map((m: CarModel) => ({
+            ...m,
+            has_params: !!(m.pcd && m.center_bore)
+          }))
+          setCarModels(modelsWithFlag)
           setLoadingModels(false)
         })
         .catch(() => setLoadingModels(false))
     } else {
       setCarModels([])
     }
-  }, [selectedCarBrand])
+  }, [selectedCarBrandId, selectedCarBrand])
 
   // Sync price inputs with URL
   useEffect(() => {
@@ -133,15 +156,18 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
   }, [minPrice, maxPrice])
 
   // Get current car filter values from URL
+  const selectedCarModelId = searchParams.get('car_model_id') || 'none'
   const selectedCarModel = searchParams.get('car_model') || 'none'
   const selectedCarYear = searchParams.get('car_year') || 'none'
   const selectedCarModification = searchParams.get('car_modification') || 'none'
   const selectedCarDiameter = searchParams.get('diameter') || 'none'
 
   // Live update for car brand - reset dependent fields
-  const handleCarBrandChange = useCallback((value: string) => {
+  const handleCarBrandChange = useCallback((brandId: string, brandName: string) => {
     updateParams({
-      car_brand: value === 'none' ? null : value,
+      car_brand_id: brandId === 'none' ? null : brandId,
+      car_brand: brandName === 'none' ? null : brandName,
+      car_model_id: null,
       car_model: null,
       car_modification: null,
     })
@@ -152,10 +178,11 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
     updateParams({ car_year: value === 'none' ? null : value })
   }, [updateParams])
 
-  // Live update for car model - reset modification
-  const handleCarModelChange = useCallback((value: string) => {
+  // Live update for car model - reset modification and set model_id for auto-matching
+  const handleCarModelChange = useCallback((modelId: string, modelName: string) => {
     updateParams({
-      car_model: value === 'none' ? null : value,
+      car_model_id: modelId === 'none' ? null : modelId,
+      car_model: modelName === 'none' ? null : modelName,
       car_modification: null,
     })
   }, [updateParams])
@@ -211,14 +238,21 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3 sm:gap-4">
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Марка</Label>
-              <Select value={selectedCarBrand} onValueChange={handleCarBrandChange} disabled={loadingBrands}>
+              <Select 
+                value={selectedCarBrandId} 
+                onValueChange={(value) => {
+                  const brand = carBrands.find(b => b.id === value)
+                  handleCarBrandChange(value, brand?.name || value)
+                }} 
+                disabled={loadingBrands}
+              >
                 <SelectTrigger className="h-10">
                   <SelectValue placeholder={loadingBrands ? "Загрузка..." : "Выберите"} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Любая марка</SelectItem>
                   {carBrands.map((brand) => (
-                    <SelectItem key={brand.id} value={brand.name}>{brand.name}</SelectItem>
+                    <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -227,17 +261,23 @@ export function CatalogFilters({ searchParams, updateParams }: CatalogFiltersPro
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Модель</Label>
               <Select
-                value={selectedCarModel}
-                onValueChange={handleCarModelChange}
-                disabled={selectedCarBrand === 'none' || loadingModels}
+                value={selectedCarModelId}
+                onValueChange={(value) => {
+                  const model = carModels.find(m => m.id === value)
+                  handleCarModelChange(value, model?.name || value)
+                }}
+                disabled={selectedCarBrandId === 'none' || loadingModels}
               >
                 <SelectTrigger className="h-10">
-                  <SelectValue placeholder={loadingModels ? 'Загрузка...' : selectedCarBrand !== 'none' ? 'Выберите' : 'Сначала марку'} />
+                  <SelectValue placeholder={loadingModels ? 'Загрузка...' : selectedCarBrandId !== 'none' ? 'Выберите' : 'Сначала марку'} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Любая модель</SelectItem>
                   {carModels.map((model) => (
-                    <SelectItem key={model.id} value={model.name}>{model.name}</SelectItem>
+                    <SelectItem key={model.id} value={model.id}>
+                      {model.name}
+                      {model.has_params && <span className="ml-2 text-xs text-primary">*</span>}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>

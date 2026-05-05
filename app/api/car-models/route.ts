@@ -5,13 +5,19 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const brandId = searchParams.get('brandId')
   const brandName = searchParams.get('brandName')
+  const includeParams = searchParams.get('includeParams') === 'true'
 
   try {
     const supabase = await createClient()
     
+    // Если нужны параметры совместимости - добавляем их в запрос
+    const selectFields = includeParams 
+      ? 'id, name, brand_id, pcd, center_bore, diameter_min, diameter_max, width_min, width_max, et_min, et_max'
+      : 'id, name, brand_id'
+    
     let query = supabase
       .from('car_models')
-      .select('id, name, brand_id')
+      .select(selectFields)
       .order('name', { ascending: true })
 
     if (brandId) {

@@ -253,7 +253,7 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
       if (navigator.share && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: 'ИИ-примерка диска',
+          title: 'Примерка диска',
           text: `Примерка диска ${wheel?.name} от ДискиБел`
         })
       } else {
@@ -380,7 +380,7 @@ export function ARCamera({ wheel, onBack, onChangeWheel, wheels, onWheelChange }
           <Button variant="ghost" size="icon" onClick={onBack}>
             <ChevronLeft className="w-5 h-5" />
           </Button>
-          <h1 className="font-semibold">ИИ-примерка</h1>
+          <h1 className="font-semibold">Примерка</h1>
           <div className="w-10" />
         </div>
         

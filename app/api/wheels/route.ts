@@ -7,13 +7,32 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
 
   // Проверяем, есть ли фильтр по автомобилю
+  const carBrandId = searchParams.get('car_brand_id')
+  const carModelId = searchParams.get('car_model_id')
+  const carYear = searchParams.get('car_year')
+  // Для обратной совместимости
   const carBrand = searchParams.get('car_brand')
   const carModel = searchParams.get('car_model')
-  const carYear = searchParams.get('car_year')
 
-  // Если есть фильтр по автомобилю, сначала находим wheel_id из таблицы совместимости
+  // Параметры для автоматического подбора по модели авто
+  let autoMatchParams: { pcd?: string; center_bore?: number; diameter_min?: number; diameter_max?: number; width_min?: number; width_max?: number; et_min?: number; et_max?: number } | null = null
+  
+  // Новая логика: автоподбор по параметрам модели из справочника
+  if (carModelId) {
+    const { data: carModelData } = await supabase
+      .from('car_models')
+      .select('pcd, center_bore, diameter_min, diameter_max, width_min, width_max, et_min, et_max')
+      .eq('id', carModelId)
+      .single()
+    
+    if (carModelData && carModelData.pcd) {
+      autoMatchParams = carModelData
+    }
+  }
+
+  // Старая логика: ручная привязка (для обратной совместимости)
   let wheelIdsFromCar: string[] | null = null
-  if (carBrand || carModel || carYear) {
+  if (!autoMatchParams && (carBrand || carModel || carYear)) {
     let compatQuery = supabase.from('wheel_car_compatibility').select('wheel_id')
     
     if (carBrand) compatQuery = compatQuery.eq('car_brand', carBrand)
@@ -29,8 +48,40 @@ export async function GET(request: NextRequest) {
 
   let query = supabase.from('wheels').select('*', { count: 'exact' })
   
-  // Если искали по авто и нашли wheel_ids
-  if (wheelIdsFromCar !== null) {
+  // Автоматический подбор по параметрам модели авто
+  if (autoMatchParams) {
+    // Фильтруем по PCD (разболтовка)
+    if (autoMatchParams.pcd) {
+      query = query.eq('pcd', autoMatchParams.pcd)
+    }
+    // ЦО диска должен быть >= ЦО авто (можно использовать центровочные кольца)
+    if (autoMatchParams.center_bore) {
+      query = query.gte('center_bore', autoMatchParams.center_bore)
+    }
+    // Диаметр в диапазоне
+    if (autoMatchParams.diameter_min) {
+      query = query.gte('diameter', autoMatchParams.diameter_min)
+    }
+    if (autoMatchParams.diameter_max) {
+      query = query.lte('diameter', autoMatchParams.diameter_max)
+    }
+    // Ширина в диапазоне
+    if (autoMatchParams.width_min) {
+      query = query.gte('width', autoMatchParams.width_min)
+    }
+    if (autoMatchParams.width_max) {
+      query = query.lte('width', autoMatchParams.width_max)
+    }
+    // Вылет в диапазоне
+    if (autoMatchParams.et_min) {
+      query = query.gte('et', autoMatchParams.et_min)
+    }
+    if (autoMatchParams.et_max) {
+      query = query.lte('et', autoMatchParams.et_max)
+    }
+  }
+  // Старая логика: если искали по авто и нашли wheel_ids
+  else if (wheelIdsFromCar !== null) {
     if (wheelIdsFromCar.length === 0) {
       // Нет совместимых дисков - возвращаем пустой результат
       return NextResponse.json({
@@ -73,9 +124,10 @@ export async function GET(request: NextRequest) {
   if (inStock === 'true') query = query.eq('in_stock', true)
   if (search) query = query.or(`name.ilike.%${search}%,brand.ilike.%${search}%,model.ilike.%${search}%`)
 
-  // Сортировка
+  // Сортировка - сначала "в наличии", потом по выбранному параметру
   const sortBy = searchParams.get('sort_by') || 'created_at'
   const sortOrder = searchParams.get('sort_order') === 'asc' ? true : false
+  query = query.order('in_stock', { ascending: false }) // Сначала в наличии
   query = query.order(sortBy, { ascending: sortOrder })
 
   // Пагинация

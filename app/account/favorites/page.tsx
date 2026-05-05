@@ -133,8 +133,8 @@ export default function FavoritesPage() {
                     className="object-cover"
                   />
                   {!item.wheel.in_stock && (
-                    <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
-                      <span className="text-muted-foreground font-medium">Нет в наличии</span>
+                    <div className="absolute top-2 left-2">
+                      <span className="bg-amber-500 text-white text-xs px-2 py-1 rounded font-medium">Под заказ</span>
                     </div>
                   )}
                 </div>

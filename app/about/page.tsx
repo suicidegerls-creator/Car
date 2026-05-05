@@ -22,7 +22,7 @@ const features = [
   {
     icon: Award,
     title: 'Премиальное качество',
-    description: 'В нашем ассортименте только проверенные бренды с мировым именем: BBS, OZ Racing, Enkei, Vossen и другие.',
+    description: 'В нашем ассортименте только проверенные бренды: Techline, RST, K&K, SKAD, iFree, Alcasta и другие.',
   },
   {
     icon: Users,
@@ -44,8 +44,8 @@ const stats = [
 ]
 
 const brands = [
-  'BBS', 'OZ Racing', 'Enkei', 'Vossen', 'Rays', 'Work Wheels', 
-  'Advan', 'SSR', 'Rotiform', 'HRE', 'Forgiato', 'ADV.1'
+  'Techline', 'RST', 'Venti', 'K&K', 'SKAD', 'SL', 
+  'iFree', 'Alcasta', 'Carwel', 'Vector', 'Megami', 'X-Trike'
 ]
 
 export default function AboutPage() {

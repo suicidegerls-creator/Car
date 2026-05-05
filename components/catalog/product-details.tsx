@@ -203,7 +203,7 @@ export function ProductDetails({ wheel }: ProductDetailsProps) {
                 )}
               </>
             ) : (
-              <Badge variant="destructive">Нет в наличии</Badge>
+              <Badge className="bg-amber-500 text-white border-0">Под заказ</Badge>
             )}
           </div>
 
@@ -221,7 +221,7 @@ export function ProductDetails({ wheel }: ProductDetailsProps) {
             <Button variant="secondary" className="flex-1" asChild>
               <Link href={`/ar-fitting?wheel=${wheel.id}`}>
                 <Camera className="w-4 h-4 mr-2" />
-                ИИ-примерка
+                Примерка
               </Link>
             </Button>
             <Button variant="outline" className="flex-1" asChild>

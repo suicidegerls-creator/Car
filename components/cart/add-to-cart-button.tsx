@@ -48,10 +48,10 @@ export function AddToCartButton({
       <Button 
         variant="outline" 
         size={size} 
-        disabled 
-        className={className}
+        className={`${className} bg-amber-500 hover:bg-amber-600 text-white`}
+        onClick={handleAddToCart}
       >
-        Нет в наличии
+        Под заказ
       </Button>
     )
   }

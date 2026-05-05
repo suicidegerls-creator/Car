@@ -139,9 +139,9 @@ function InteractiveCard({ wheel }: { wheel: Wheel }) {
             </div>
             
             {!wheel.in_stock && (
-              <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
-                <Badge variant="secondary">Нет в наличии</Badge>
-              </div>
+              <Badge className="absolute top-3 left-3 bg-amber-500/90 text-white border-0 z-10">
+                Под заказ
+              </Badge>
             )}
             {wheel.old_price && wheel.old_price > wheel.price && (
               <Badge className="absolute top-3 left-3 bg-destructive text-destructive-foreground animate-pulse">

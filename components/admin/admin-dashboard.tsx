@@ -22,11 +22,12 @@ import {
 } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Search, Edit, Trash2, Package, LogOut, RefreshCw, ShoppingBag, Headphones } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Package, LogOut, RefreshCw, ShoppingBag, Headphones, Car } from 'lucide-react'
 import { Wheel, WHEEL_TYPE_LABELS } from '@/lib/types/wheel'
 import { WheelForm } from './wheel-form'
 import { OrdersManagement } from './orders-management'
 import { SupportManagement } from './support-management'
+import { CarsManagement } from './cars-management'
 
 export function AdminDashboard() {
   const [wheels, setWheels] = useState<Wheel[]>([])
@@ -110,10 +111,14 @@ export function AdminDashboard() {
 
       <main className="container mx-auto px-4 py-6">
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full max-w-xl grid-cols-3">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4">
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="w-4 h-4" />
               Товары
+            </TabsTrigger>
+            <TabsTrigger value="cars" className="flex items-center gap-2">
+              <Car className="w-4 h-4" />
+              Автомобили
             </TabsTrigger>
             <TabsTrigger value="orders" className="flex items-center gap-2">
               <ShoppingBag className="w-4 h-4" />
@@ -307,6 +312,10 @@ export function AdminDashboard() {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
+
+          <TabsContent value="cars">
+            <CarsManagement />
           </TabsContent>
 
           <TabsContent value="orders">

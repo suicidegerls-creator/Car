@@ -130,7 +130,7 @@ export function BrandsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <p className="text-muted-foreground text-sm tracking-[0.3em] uppercase">
-            Официальный дилер
+            Наши бренды
           </p>
         </div>
 
